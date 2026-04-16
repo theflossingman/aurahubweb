@@ -1,0 +1,4096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Aura Hub - Family Dashboard</title>
+    <meta name="description" content="A beautiful family PWA dashboard inspired by Umbrel OS">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    
+    <!-- PWA Install Prompt -->
+    <script src="scripts/pwa-install.js" defer></script>
+    <script src="websocket-client.js" defer></script>
+    <script src="scripts/main.js" defer></script>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="background">
+        <div class="gradient-orbs">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+        </div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen login-screen">
+        <div class="login-container">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">Aura Hub</div>
+                </div>
+                <h1 class="app-title">Aura Hub</h1>
+                <p class="app-subtitle">Family Dashboard</p>
+            </div>
+            
+            <div class="users-grid">
+                <a href="#" class="user-card" data-user="max" onclick="showPasswordModal('max', 'M', 'avatar-1'); return false;">
+                    <div class="user-avatar">
+                        <div class="avatar-gradient avatar-1"></div>
+                        <span class="user-initial">M</span>
+                    </div>
+                    <h3 class="user-name">Max</h3>
+                    <p class="user-status">Online</p>
+                </a>
+                
+                <a href="#" class="user-card" data-user="gigi" onclick="showPasswordModal('gigi', 'G', 'avatar-2'); return false;">
+                    <div class="user-avatar">
+                        <div class="avatar-gradient avatar-2"></div>
+                        <span class="user-initial">G</span>
+                    </div>
+                    <h3 class="user-name">Gigi</h3>
+                    <p class="user-status">Online</p>
+                </a>
+                
+                <a href="#" class="user-card" data-user="marco" onclick="showPasswordModal('marco', 'M', 'avatar-3'); return false;">
+                    <div class="user-avatar">
+                        <div class="avatar-gradient avatar-3"></div>
+                        <span class="user-initial">M</span>
+                    </div>
+                    <h3 class="user-name">Marco</h3>
+                    <p class="user-status">Online</p>
+                </a>
+                
+                <a href="#" class="user-card" data-user="dezi" onclick="showPasswordModal('dezi', 'D', 'avatar-4'); return false;">
+                    <div class="user-avatar">
+                        <div class="avatar-gradient avatar-4"></div>
+                        <span class="user-initial">D</span>
+                    </div>
+                    <h3 class="user-name">Dezi</h3>
+                    <p class="user-status">Online</p>
+                </a>
+                
+                <a href="#" class="user-card" data-user="sevi" onclick="showPasswordModal('sevi', 'S', 'avatar-5'); return false;">
+                    <div class="user-avatar">
+                        <div class="avatar-gradient avatar-5"></div>
+                        <span class="user-initial">S</span>
+                    </div>
+                    <h3 class="user-name">Sevi</h3>
+                    <p class="user-status">Online</p>
+                </a>
+                
+                            </div>
+            
+            <div class="login-footer">
+                <p class="version">v3.2.0 -Official-
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closePasswordModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Enter Password</h3>
+                <button class="modal-close" onclick="closePasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="password-user-info">
+                    <div class="password-avatar">
+                        <div class="avatar-gradient avatar-1"></div>
+                        <span class="password-user-initial">M</span>
+                    </div>
+                    <h4 class="password-user-name">Max</h4>
+                </div>
+                <div class="password-input-group">
+                    <input type="password" id="passwordInput" class="password-input" placeholder="Enter password" onkeypress="handlePasswordKeyPress(event)">
+                    <div class="password-toggle" onclick="togglePasswordVisibility()">
+                        <span id="passwordToggleIcon">👁️</span>
+                    </div>
+                </div>
+                <div id="passwordError" class="password-error hidden">Incorrect password. Please try again.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="authenticateUser()">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marketplace Modal -->
+    <div id="marketplaceModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closeMarketplace()"></div>
+        <div class="modal-content marketplace-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Marketplace</h3>
+                <button class="modal-close" onclick="closeMarketplace()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="marketplace-tabs">
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" onclick="switchTab('background')" id="backgroundTab">Background</button>
+                        <button class="tab-btn" onclick="switchTab('badges')" id="badgesTab">Badges</button>
+                        <button class="tab-btn" onclick="switchTab('locker')" id="lockerTab">Locker</button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <!-- Background Tab -->
+                        <div class="tab-pane active" id="backgroundPane">
+                            <h4>Choose Your Background</h4>
+                            <div class="background-grid">
+                                <div class="bg-option" onclick="selectBackground('gradient1')">
+                                    <div class="bg-preview gradient-preview-1 animated-bg-1"></div>
+                                    <p>Ocean Blue</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient2')">
+                                    <div class="bg-preview gradient-preview-2 animated-bg-2"></div>
+                                    <p>Sunset Purple</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient3')">
+                                    <div class="bg-preview gradient-preview-3 animated-bg-3"></div>
+                                    <p>Dark Forest</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient4')">
+                                    <div class="bg-preview gradient-preview-4 animated-bg-4"></div>
+                                    <p>Galaxy Dark</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient5')">
+                                    <div class="bg-preview gradient-preview-5 animated-bg-5"></div>
+                                    <p>Golden Hour</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient6')">
+                                    <div class="bg-preview gradient-preview-6 animated-bg-6"></div>
+                                    <p>Rose Pink</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient7')">
+                                    <div class="bg-preview gradient-preview-7 animated-bg-7"></div>
+                                    <p>Deep Purple</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient8')">
+                                    <div class="bg-preview gradient-preview-8 animated-bg-8"></div>
+                                    <p>Fire Orange</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient9')">
+                                    <div class="bg-preview gradient-preview-9 animated-bg-9"></div>
+                                    <p>Dark Ocean</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient10')">
+                                    <div class="bg-preview gradient-preview-10 animated-bg-10"></div>
+                                    <p>Ruby Red</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient11')">
+                                    <div class="bg-preview gradient-preview-11 animated-bg-11"></div>
+                                    <p>Forest Night</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient12')">
+                                    <div class="bg-preview gradient-preview-12 animated-bg-12"></div>
+                                    <p>Wine Red</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient13')">
+                                    <div class="bg-preview gradient-preview-13 animated-bg-13"></div>
+                                    <p>Sunset Blaze</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient14')">
+                                    <div class="bg-preview gradient-preview-14 animated-bg-14"></div>
+                                    <p>Midnight Blue</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient15')">
+                                    <div class="bg-preview gradient-preview-15 animated-bg-15"></div>
+                                    <p>Deep Ocean</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient16')">
+                                    <div class="bg-preview gradient-preview-16 animated-bg-16"></div>
+                                    <p>Coral Reef</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient17')">
+                                    <div class="bg-preview gradient-preview-17 animated-bg-17"></div>
+                                    <p>Midnight Sky</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient18')">
+                                    <div class="bg-preview gradient-preview-18 animated-bg-18"></div>
+                                    <p>Dark Sunset</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient19')">
+                                    <div class="bg-preview gradient-preview-19 animated-bg-19"></div>
+                                    <p>Deep Blue</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient20')">
+                                    <div class="bg-preview gradient-preview-20 animated-bg-20"></div>
+                                    <p>Sunset Gold</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient21')">
+                                    <div class="bg-preview gradient-preview-21 animated-bg-21"></div>
+                                    <p>Emerald Forest</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient22')">
+                                    <div class="bg-preview gradient-preview-22 animated-bg-22"></div>
+                                    <p>Ruby Red</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient23')">
+                                    <div class="bg-preview gradient-preview-23 animated-bg-23"></div>
+                                    <p>Navy Blue</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient24')">
+                                    <div class="bg-preview gradient-preview-24 animated-bg-24"></div>
+                                    <p>Violet Purple</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient25')">
+                                    <div class="bg-preview gradient-preview-25 animated-bg-25"></div>
+                                    <p>Autumn Leaves</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient26')">
+                                    <div class="bg-preview gradient-preview-26 animated-bg-26"></div>
+                                    <p>Cotton Candy</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient27')">
+                                    <div class="bg-preview gradient-preview-27 animated-bg-27"></div>
+                                    <p>Storm Gray</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient28')">
+                                    <div class="bg-preview gradient-preview-28 animated-bg-28"></div>
+                                    <p>Dark Green</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient29')">
+                                    <div class="bg-preview gradient-preview-29 animated-bg-29"></div>
+                                    <p>Hot Pink</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                                <div class="bg-option" onclick="selectBackground('gradient30')">
+                                    <div class="bg-preview gradient-preview-30 animated-bg-30"></div>
+                                    <p>Dark Teal</p>
+                                    <span class="price">100 coins</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Badges Tab -->
+                        <div class="tab-pane" id="badgesPane">
+                            <h4>Collect Badges</h4>
+                            <div class="badges-grid" id="badgesGrid">
+                                <!-- Badges will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Locker Tab -->
+                        <div class="tab-pane" id="lockerPane">
+                            <h4>Your Locker</h4>
+                            <div class="locker-tabs">
+                                <div class="locker-tab-navigation">
+                                    <button class="locker-tab-btn active" onclick="switchLockerTab('backgrounds')" id="lockerBackgroundsTab">Backgrounds</button>
+                                    <button class="locker-tab-btn" onclick="switchLockerTab('badges')" id="lockerBadgesTab">Owned Badges</button>
+                                </div>
+                                
+                                <div class="locker-tab-content">
+                                    <!-- Backgrounds Sub-Tab -->
+                                    <div class="locker-tab-pane active" id="lockerBackgroundsPane">
+                                        <div id="lockerContent">
+                                            <div class="empty-section" id="emptyLocker">
+                                                <p>You haven't purchased any backgrounds yet!</p>
+                                                <p>Visit the Background tab to purchase some amazing backgrounds.</p>
+                                            </div>
+                                            <div class="locker-grid" id="lockerGrid" style="display: none;">
+                                                <!-- Purchased backgrounds will be displayed here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Owned Badges Sub-Tab -->
+                                    <div class="locker-tab-pane" id="lockerBadgesPane">
+                                        <div id="ownedBadgesContent">
+                                            <div class="empty-section" id="emptyOwnedBadges">
+                                                <p>You haven't purchased any badges yet!</p>
+                                                <p>Visit the Badges tab to purchase some amazing badges.</p>
+                                            </div>
+                                            <div class="owned-badges-grid" id="ownedBadgesGrid" style="display: none;">
+                                                <!-- Purchased badges will be displayed here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeMarketplace()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aura Control Modal -->
+    <div id="auraControlModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closeAuraControl()"></div>
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Aura Control (Admin)</h3>
+                <button class="modal-close" onclick="closeAuraControl()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="aura-control">
+                    <div class="reset-section">
+                        <h4>Admin Controls</h4>
+                        <p class="reset-description">This will reset all users' aura back to 0. This action cannot be undone.</p>
+                        <div class="control-actions">
+                            <button class="btn btn-danger" onclick="resetAllAura()">Reset All Aura to 0</button>
+                            <button class="btn btn-warning" onclick="resetAllCoins()">Reset All Coins to 0</button>
+                            <button class="btn btn-secondary" onclick="refreshAuraControl()">Refresh Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAuraControl()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Modal -->
+    <div id="recentActivityModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closeRecentActivity()"></div>
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Recent Activity</h3>
+                <button class="modal-close" onclick="closeRecentActivity()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="activity-container">
+                    <h4>Aura Tracker Activity</h4>
+                    <div class="activity-list" id="activityList">
+                        <!-- Activities will be populated here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="clearActivity()">Clear Activity</button>
+                <button class="btn btn-primary" onclick="closeRecentActivity()">Close</button>
+            </div>
+        </div>
+    </div>
+
+<!-- User Edit Modal -->
+    <div id="userEditModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closeUserEditModal()"></div>
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit All Users</h3>
+                <button class="modal-close" onclick="closeUserEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-edit-container">
+                    <h4>User Management</h4>
+                    <div class="users-edit-grid">
+                        <div class="user-edit-card" data-user="max">
+                            <div class="user-edit-header">
+                                <div class="user-avatar-small">
+                                    <div class="avatar-gradient avatar-1"></div>
+                                    <span class="user-initial-small">M</span>
+                                </div>
+                                <h5 class="user-edit-name">Max</h5>
+                            </div>
+                            <div class="user-edit-fields">
+                                <div class="field-group">
+                                    <label>Aura:</label>
+                                    <input type="number" class="aura-input" id="edit-max-aura" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Coins:</label>
+                                    <input type="number" class="coin-input" id="edit-max-coins" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Password:</label>
+                                    <input type="password" class="password-input" id="edit-max-password" placeholder="New password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-edit-card" data-user="gigi">
+                            <div class="user-edit-header">
+                                <div class="user-avatar-small">
+                                    <div class="avatar-gradient avatar-2"></div>
+                                    <span class="user-initial-small">G</span>
+                                </div>
+                                <h5 class="user-edit-name">Gigi</h5>
+                            </div>
+                            <div class="user-edit-fields">
+                                <div class="field-group">
+                                    <label>Aura:</label>
+                                    <input type="number" class="aura-input" id="edit-gigi-aura" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Coins:</label>
+                                    <input type="number" class="coin-input" id="edit-gigi-coins" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Password:</label>
+                                    <input type="password" class="password-input" id="edit-gigi-password" placeholder="New password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-edit-card" data-user="marco">
+                            <div class="user-edit-header">
+                                <div class="user-avatar-small">
+                                    <div class="avatar-gradient avatar-3"></div>
+                                    <span class="user-initial-small">M</span>
+                                </div>
+                                <h5 class="user-edit-name">Marco</h5>
+                            </div>
+                            <div class="user-edit-fields">
+                                <div class="field-group">
+                                    <label>Aura:</label>
+                                    <input type="number" class="aura-input" id="edit-marco-aura" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Coins:</label>
+                                    <input type="number" class="coin-input" id="edit-marco-coins" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Password:</label>
+                                    <input type="password" class="password-input" id="edit-marco-password" placeholder="New password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-edit-card" data-user="dezi">
+                            <div class="user-edit-header">
+                                <div class="user-avatar-small">
+                                    <div class="avatar-gradient avatar-4"></div>
+                                    <span class="user-initial-small">D</span>
+                                </div>
+                                <h5 class="user-edit-name">Dezi</h5>
+                            </div>
+                            <div class="user-edit-fields">
+                                <div class="field-group">
+                                    <label>Aura:</label>
+                                    <input type="number" class="aura-input" id="edit-dezi-aura" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Coins:</label>
+                                    <input type="number" class="coin-input" id="edit-dezi-coins" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Password:</label>
+                                    <input type="password" class="password-input" id="edit-dezi-password" placeholder="New password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-edit-card" data-user="sevi">
+                            <div class="user-edit-header">
+                                <div class="user-avatar-small">
+                                    <div class="avatar-gradient avatar-5"></div>
+                                    <span class="user-initial-small">S</span>
+                                </div>
+                                <h5 class="user-edit-name">Sevi</h5>
+                            </div>
+                            <div class="user-edit-fields">
+                                <div class="field-group">
+                                    <label>Aura:</label>
+                                    <input type="number" class="aura-input" id="edit-sevi-aura" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Coins:</label>
+                                    <input type="number" class="coin-input" id="edit-sevi-coins" value="0" min="0">
+                                </div>
+                                <div class="field-group">
+                                    <label>Password:</label>
+                                    <input type="password" class="password-input" id="edit-sevi-password" placeholder="New password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info" onclick="exportData()">Export Data</button>
+                <button class="btn btn-warning" onclick="document.getElementById('importFile').click()">Import Data</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                <button class="btn btn-secondary" onclick="closeUserEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveAllUsers()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aura Tracker App Screen -->
+    <div id="auraTrackerScreen" class="screen app-screen hidden">
+        <div class="app-container">
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="back-btn" onclick="closeApp('aura-tracker')">
+                        <span>&larr;</span>
+                        <span>Back</span>
+                    </button>
+                    <h2 class="app-title">Aura Tracker</h2>
+                </div>
+                <div class="header-right">
+                    <button class="activity-btn" onclick="openRecentActivity()" title="Recent Activity">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H17"/>
+                        </svg>
+                    </button>
+                    <button class="refresh-btn" onclick="refreshAuraData()" title="Refresh Aura Data">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 4v6h-6"/>
+                            <path d="M1 20v-6h6"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                    </button>
+                    <button class="settings-btn" onclick="viewDetails()" title="Debug Info">?</button>
+                    <button class="settings-btn" onclick="openAuraControl()" title="Aura Control (Admin Only)" id="auraControlBtn" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- App Content -->
+            <main class="app-main">
+                <!-- Notification Container -->
+                <div id="notificationContainer" class="notification-container"></div>
+                
+                <div class="people-grid">
+                    <div class="person-card" onclick="selectPerson('max')">
+                        <h3 class="person-name">Max</h3>
+                        <div class="card-middle">
+                            <span class="aura-text">Aura</span>
+                            <span class="aura-number" data-user-aura="max">0</span>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn card-btn-minus" onclick="event.stopPropagation(); cardAction('max', 'decrement')">−</button>
+                            <button class="card-btn card-btn-plus" onclick="event.stopPropagation(); cardAction('max', 'increment')">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card" onclick="selectPerson('gigi')">
+                        <h3 class="person-name">Gigi</h3>
+                        <div class="card-middle">
+                            <span class="aura-text">Aura</span>
+                            <span class="aura-number" data-user-aura="gigi">0</span>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn card-btn-minus" onclick="event.stopPropagation(); cardAction('gigi', 'decrement')">−</button>
+                            <button class="card-btn card-btn-plus" onclick="event.stopPropagation(); cardAction('gigi', 'increment')">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card" onclick="selectPerson('marco')">
+                        <h3 class="person-name">Marco</h3>
+                        <div class="card-middle">
+                            <span class="aura-text">Aura</span>
+                            <span class="aura-number" data-user-aura="marco">0</span>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn card-btn-minus" onclick="event.stopPropagation(); cardAction('marco', 'decrement')">−</button>
+                            <button class="card-btn card-btn-plus" onclick="event.stopPropagation(); cardAction('marco', 'increment')">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card" onclick="selectPerson('dezi')">
+                        <h3 class="person-name">Dezi</h3>
+                        <div class="card-middle">
+                            <span class="aura-text">Aura</span>
+                            <span class="aura-number" data-user-aura="dezi">0</span>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn card-btn-minus" onclick="event.stopPropagation(); cardAction('dezi', 'decrement')">−</button>
+                            <button class="card-btn card-btn-plus" onclick="event.stopPropagation(); cardAction('dezi', 'increment')">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card" onclick="selectPerson('sevi')">
+                        <h3 class="person-name">Sevi</h3>
+                        <div class="card-middle">
+                            <span class="aura-text">Aura</span>
+                            <span class="aura-number" data-user-aura="sevi">0</span>
+                        </div>
+                        <div class="card-controls">
+                            <button class="card-btn card-btn-minus" onclick="event.stopPropagation(); cardAction('sevi', 'decrement')">−</button>
+                            <button class="card-btn card-btn-plus" onclick="event.stopPropagation(); cardAction('sevi', 'increment')">+</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardScreen" class="screen dashboard-screen hidden">
+        <div class="dashboard-container">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <div class="logo-small">Aura Hub</div>
+                    <h2 class="dashboard-title">Dashboard</h2>
+                </div>
+                <div class="header-right">
+                    <div class="connection-status" id="connectionStatus" title="WebSocket Connection Status">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span class="status-text" id="statusText">Connecting...</span>
+                    </div>
+                    <div class="coin-display" id="coinDisplay">
+                        <div class="coin-icon"> coins</div>
+                        <div class="coin-amount" id="coinAmount">0</div>
+                    </div>
+                    <div class="user-info">
+                        <button class="user-info-btn" onclick="openUserEditModal()" title="Edit All Users">
+                            <div class="user-avatar-small">
+                                <div class="avatar-gradient avatar-1"></div>
+                                <span class="user-initial-small">M</span>
+                            </div>
+                            <div class="user-details">
+                                <h3 class="user-name-small">Max</h3>
+                                <p class="user-status-small">Online</p>
+                            </div>
+                        </button>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="dashboard-main">
+                <!-- Action Cards -->
+                <section class="actions-section">
+                    <h2 class="section-title">Apps</h2>
+                    <div class="actions-grid">
+                        <div class="action-card" onclick="openApp('aura-tracker')">
+                            <div class="action-icon">🌟</div>
+                            <h4>Aura Tracker</h4>
+                            <p>Track your aura</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="openApp('aura-flow')">
+                            <div class="action-icon">🌊</div>
+                            <h4>Aura Flow</h4>
+                            <p> Crazy feed & videos</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="openMarketplace()">
+                            <div class="action-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <h4>Marketplace</h4>
+                            <p>Customize your experience</p>
+                        </div>
+                    </div>
+                </section>
+                
+                            </main>
+        </div>
+    </div>
+
+    <!-- Aura Flow App Screen -->
+    <div id="auraFlowScreen" class="screen app-screen hidden">
+        <div class="app-container">
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="back-btn" onclick="closeApp('aura-flow')">
+                        <span>&larr;</span>
+                        <span>Back</span>
+                    </button>
+                    <h2 class="app-title">Aura Flow</h2>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar-small">
+                            <div class="avatar-gradient avatar-1"></div>
+                            <span class="user-initial-small" id="flowUserInitial">M</span>
+                        </div>
+                        <span class="current-user" id="flowCurrentUser">Max</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- App Content -->
+            <main class="aura-flow-main">
+                <!-- Feed View -->
+                <div id="feedView" class="flow-view active">
+                    <div class="feed-header">
+                        <h3>Feed</h3>
+                        <button class="refresh-feed-btn" onclick="refreshFeed()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 4v6h-6"/>
+                                <path d="M1 20v-6h6"/>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="feed-container" id="feedContainer">
+                        <!-- Posts will be dynamically added here -->
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <h4>No posts yet</h4>
+                            <p>Be the first to share something!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shorts View -->
+                <div id="shortsView" class="flow-view">
+                    <div class="shorts-container" id="shortsContainer">
+                        <!-- Shorts will be dynamically added here -->
+                        <div class="empty-state">
+                            <div class="empty-icon">🎥</div>
+                            <h4>No shorts yet</h4>
+                            <p>Record your first short video!</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Bottom Navigation -->
+            <nav class="flow-nav">
+                <button class="nav-btn active" onclick="switchFlowView('feed')" id="feedBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Feed</span>
+                </button>
+                
+                <button class="nav-btn plus-btn" onclick="openCreateModal()">
+                    <div class="plus-icon">+</div>
+                </button>
+                
+                <button class="nav-btn" onclick="switchFlowView('shorts')" id="shortsBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                    <span>Shorts</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Create Content Modal -->
+    <div id="createModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closeCreateModal()"></div>
+        <div class="modal-content create-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Create Content</h3>
+                <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="create-options">
+                    <div class="create-option" onclick="createPost()">
+                        <div class="create-icon">📝</div>
+                        <h4>Create Post</h4>
+                        <p>Share text, images, or polls</p>
+                    </div>
+                    <div class="create-option" onclick="createShort()">
+                        <div class="create-icon">🎥</div>
+                        <h4>Create Short</h4>
+                        <p>Record a short video</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Creation Modal -->
+    <div id="postCreationModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closePostCreationModal()"></div>
+        <div class="modal-content post-creation-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Create Post</h3>
+                <button class="modal-close" onclick="closePostCreationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Post Type Selection -->
+                <div class="post-type-selector">
+                    <button class="post-type-btn active" onclick="selectPostType('text')" id="textPostBtn">
+                        <span>📝</span>
+                        <span>Text</span>
+                    </button>
+                    <button class="post-type-btn" onclick="selectPostType('image')" id="imagePostBtn">
+                        <span>🖼️</span>
+                        <span>Image</span>
+                    </button>
+                </div>
+
+                <!-- Text Post Content -->
+                <div id="textPostContent" class="post-content-section active">
+                    <textarea 
+                        id="postTextInput" 
+                        placeholder="What's on your mind?" 
+                        class="post-text-input"
+                        maxlength="500"
+                    ></textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/500
+                    </div>
+                </div>
+
+                <!-- Image Post Content -->
+                <div id="imagePostContent" class="post-content-section">
+                    <textarea 
+                        id="imageCaptionInput" 
+                        placeholder="Add a caption..." 
+                        class="post-text-input"
+                        maxlength="200"
+                    ></textarea>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+                        <div class="upload-placeholder" onclick="document.getElementById('imageInput').click()">
+                            <span class="upload-icon">📷</span>
+                            <span>Click to upload image</span>
+                        </div>
+                        <div id="imagePreview" class="image-preview" style="display: none;">
+                            <img id="previewImg" src="" alt="Preview">
+                            <button class="remove-image-btn" onclick="removeImage()">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <button class="btn btn-secondary" onclick="closePostCreationModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="publishPost()">
+                        <span>📤</span> Publish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Modal -->
+    <div id="commentsModal" class="password-modal hidden">
+        <div class="modal-overlay" onclick="closeCommentsModal()"></div>
+        <div class="modal-content comments-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Comments</h3>
+                <button class="modal-close" onclick="closeCommentsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="comments-container" id="commentsContainer">
+                    <!-- Comments will be dynamically added here -->
+                </div>
+                <div class="add-comment">
+                    <div class="comment-input-group">
+                        <textarea 
+                            id="commentInput" 
+                            placeholder="Write a comment..." 
+                            class="comment-input"
+                            maxlength="300"
+                        ></textarea>
+                        <button class="btn btn-primary" onclick="addComment()">
+                            <span>Post</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // User passwords (in a real app, these would be properly hashed and secured)
+        const userPasswords = {
+            'max': '1234',
+            'gigi': '1234',
+            'marco': '1234',
+            'dezi': '1234',
+            'sevi': '1234'
+        };
+
+        let currentUser = null;
+        
+        // Aura data storage (synced from server)
+        let auraData = {
+            max: 0,
+            gigi: 0,
+            marco: 0,
+            dezi: 0,
+            sevi: 0
+        };
+        
+        // Daily aura tracking data (synced from server)
+        let dailyAuraData = {
+            max: { 
+                dezi: 0, 
+                gigi: 0, 
+                marco: 0, 
+                sevi: 0, 
+                date: getCurrentDateString() 
+            },
+            gigi: { 
+                max: 0, 
+                dezi: 0, 
+                marco: 0, 
+                sevi: 0, 
+                date: getCurrentDateString() 
+            },
+            marco: { 
+                max: 0, 
+                gigi: 0, 
+                dezi: 0, 
+                sevi: 0, 
+                date: getCurrentDateString() 
+            },
+            dezi: { 
+                max: 0, 
+                gigi: 0, 
+                marco: 0, 
+                sevi: 0, 
+                date: getCurrentDateString() 
+            },
+            sevi: { 
+                max: 0, 
+                gigi: 0, 
+                marco: 0, 
+                dezi: 0, 
+                date: getCurrentDateString() 
+            }
+        };
+        
+        // Coin data storage (synced from server)
+        let coinData = {
+            max: 0,
+            gigi: 0,
+            marco: 0,
+            dezi: 0,
+            sevi: 0
+        };
+        
+        // Purchased backgrounds tracking (per user)
+        let purchasedBackgrounds = {
+            max: [],
+            gigi: [],
+            marco: [],
+            dezi: [],
+            sevi: []
+        };
+
+        // Purchased badges tracking (per user)
+        let purchasedBadges = {
+            max: [],
+            gigi: [],
+            marco: [],
+            dezi: [],
+            sevi: []
+        };
+
+        // Equipped badges tracking (per user)
+        let equippedBadges = {
+            max: null,
+            gigi: null,
+            marco: null,
+            dezi: null,
+            sevi: null
+        };
+
+        // All available badges
+        let allBadges = [];
+        
+        // Dynamic server URL detection
+        function getServerUrl() {
+            const hostname = window.location.hostname;
+            const port = window.location.port;
+            
+            // If accessing from localhost without port, default to 3002
+            if ((hostname === 'localhost' || hostname === '127.0.0.1') && !port) {
+                return 'localhost:3002';
+            }
+            
+            // For reverse proxy, use empty string to make relative URLs
+            // This will use the same domain and path as the current page
+            if (!port || port === '80' || port === '443') {
+                return ''; // Use relative URL for reverse proxy
+            }
+            
+            // Use the current hostname and port (handles Docker port mapping)
+            if (port) {
+                return `${hostname}:${port}`;
+            }
+            
+            // Default: use same hostname with port 3002
+            return `${hostname}:3002`;
+        }
+        
+        // Load initial data from server
+        async function loadInitialData() {
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            
+            // Use relative URL for reverse proxy, absolute URL otherwise
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/aura` : '/api/aura';
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                auraData = data.auraData || auraData;
+                dailyAuraData = data.dailyAuraData || dailyAuraData;
+                coinData = data.coinData || coinData;
+                
+                // Update user passwords from server
+                if (data.passwordData) {
+                    Object.keys(data.passwordData).forEach(user => {
+                        userPasswords[user] = data.passwordData[user];
+                    });
+                    console.log('Loaded initial user passwords from server');
+                }
+                
+                console.log('Initial data loaded from server');
+                
+            } catch (error) {
+                console.error('Error loading initial data:', error);
+                // Continue with default values if server fails
+            }
+        }
+        
+        function loadPurchasedBackgrounds() {
+            if (!currentUser) return;
+            
+            // First load from localStorage for immediate UI
+            try {
+                const saved = localStorage.getItem(`purchasedBackgrounds_${currentUser}`);
+                if (saved) {
+                    purchasedBackgrounds[currentUser] = JSON.parse(saved);
+                    console.log(`Loaded ${purchasedBackgrounds[currentUser].length} purchased backgrounds from localStorage for ${currentUser}`);
+                }
+            } catch (error) {
+                console.error('Error loading purchased backgrounds from localStorage:', error);
+                purchasedBackgrounds[currentUser] = [];
+            }
+            
+            // Then sync with server
+            syncPurchasedBackgrounds();
+        }
+
+        function loadPurchasedBadges() {
+            if (!currentUser) return;
+            
+            // First load from localStorage for immediate UI
+            try {
+                const saved = localStorage.getItem(`purchasedBadges_${currentUser}`);
+                if (saved) {
+                    purchasedBadges[currentUser] = JSON.parse(saved);
+                    console.log(`Loaded ${purchasedBadges[currentUser].length} purchased badges from localStorage for ${currentUser}`);
+                }
+            } catch (error) {
+                console.error('Error loading purchased badges from localStorage:', error);
+                purchasedBadges[currentUser] = [];
+            }
+            
+            // Then sync with server
+            syncPurchasedBadges();
+        }
+
+        function loadEquippedBadges() {
+            if (!currentUser) return;
+            
+            // First load from localStorage for immediate UI
+            try {
+                const saved = localStorage.getItem(`equippedBadges_${currentUser}`);
+                if (saved) {
+                    equippedBadges[currentUser] = JSON.parse(saved);
+                    console.log(`Loaded equipped badge: ${equippedBadges[currentUser]} for ${currentUser}`);
+                }
+            } catch (error) {
+                console.error('Error loading equipped badges from localStorage:', error);
+                equippedBadges[currentUser] = null;
+            }
+            
+            // Then sync with server
+            syncEquippedBadges();
+        }
+
+        function loadAllBadges() {
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/badges` : '/api/badges';
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        allBadges = data.badges;
+                        console.log(`Loaded ${allBadges.length} available badges`);
+                        populateBadgesGrid();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading badges:', error);
+                });
+        }
+
+        function syncPurchasedBackgrounds() {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/purchased-backgrounds/${currentUser}` : `/api/purchased-backgrounds/${currentUser}`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const serverBackgrounds = data.backgrounds || [];
+                        const localBackgrounds = purchasedBackgrounds[currentUser] || [];
+                        
+                        // Merge server and local backgrounds
+                        const mergedBackgrounds = [...new Set([...serverBackgrounds, ...localBackgrounds])];
+                        
+                        // Update local data
+                        purchasedBackgrounds[currentUser] = mergedBackgrounds;
+                        localStorage.setItem(`purchasedBackgrounds_${currentUser}`, JSON.stringify(mergedBackgrounds));
+                        
+                        // If we have new backgrounds from server, sync them back
+                        if (localBackgrounds.length > 0 && localBackgrounds.length > serverBackgrounds.length) {
+                            syncPurchasedBackgroundsToServer();
+                        }
+                        
+                        console.log(`Synced ${mergedBackgrounds.length} purchased backgrounds for ${currentUser}`);
+                        
+                        // Update UI
+                        updateMarketplaceUI();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error syncing purchased backgrounds:', error);
+                });
+        }
+
+        function syncPurchasedBackgroundsToServer() {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/purchased-backgrounds/${currentUser}/sync` : `/api/purchased-backgrounds/${currentUser}/sync`;
+            
+            const backgrounds = purchasedBackgrounds[currentUser] || [];
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ backgrounds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Synced ${backgrounds.length} backgrounds to server for ${currentUser}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error syncing purchased backgrounds to server:', error);
+            });
+        }
+
+        // Start periodic sync for real-time updates
+        let syncInterval;
+        function startPeriodicSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+            }
+            
+            // Sync every 30 seconds
+            syncInterval = setInterval(() => {
+                if (currentUser) {
+                    syncPurchasedBackgrounds();
+                    syncPurchasedBadges();
+                    syncEquippedBadges();
+                }
+            }, 30000);
+            
+            console.log('Started periodic sync for purchased backgrounds and badges');
+        }
+
+        function stopPeriodicSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+                syncInterval = null;
+                console.log('Stopped periodic sync for purchased backgrounds');
+            }
+        }
+
+        function syncPurchasedBadges() {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/purchased-badges/${currentUser}` : `/api/purchased-badges/${currentUser}`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const serverBadges = data.badges || [];
+                        const localBadges = purchasedBadges[currentUser] || [];
+                        
+                        // Merge server and local badges
+                        const mergedBadges = [...new Set([...serverBadges, ...localBadges])];
+                        
+                        // Update local data
+                        purchasedBadges[currentUser] = mergedBadges;
+                        localStorage.setItem(`purchasedBadges_${currentUser}`, JSON.stringify(mergedBadges));
+                        
+                        // If we have new badges from server, sync them back
+                        if (localBadges.length > 0 && localBadges.length > serverBadges.length) {
+                            syncPurchasedBadgesToServer();
+                        }
+                        
+                        console.log(`Synced ${mergedBadges.length} purchased badges for ${currentUser}`);
+                        
+                        // Update UI
+                        updateBadgesUI();
+                        updateOwnedBadgesGrid();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error syncing purchased badges:', error);
+                });
+        }
+
+        function syncPurchasedBadgesToServer() {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/purchased-badges/${currentUser}/sync` : `/api/purchased-badges/${currentUser}/sync`;
+            
+            const badges = purchasedBadges[currentUser] || [];
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ badges })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Synced ${badges.length} badges to server for ${currentUser}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error syncing purchased badges to server:', error);
+            });
+        }
+
+        function syncEquippedBadges() {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/equipped-badge/${currentUser}` : `/api/equipped-badge/${currentUser}`;
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        equippedBadges[currentUser] = data.badge;
+                        localStorage.setItem(`equippedBadges_${currentUser}`, JSON.stringify(data.badge));
+                        console.log(`Synced equipped badge: ${data.badge} for ${currentUser}`);
+                        
+                        // Update UI
+                        updateBadgesUI();
+                        updateOwnedBadgesGrid();
+                        updateUserCards();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error syncing equipped badges:', error);
+                });
+        }
+
+        function populateBadgesGrid() {
+            const badgesGrid = document.getElementById('badgesGrid');
+            if (!badgesGrid || allBadges.length === 0) return;
+            
+            badgesGrid.innerHTML = '';
+            
+            allBadges.forEach((badge, index) => {
+                const isOwned = purchasedBadges[currentUser] && purchasedBadges[currentUser].includes(badge);
+                const isEquipped = equippedBadges[currentUser] === badge;
+                const price = 400; // All badges cost 400 coins
+                
+                const badgeItem = document.createElement('div');
+                badgeItem.className = `badge-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
+                
+                badgeItem.innerHTML = `
+                    <div class="badge-icon">${badge.includes('👑') || badge.includes('😂') || badge.includes('💀') || badge.includes('🔥') || badge.includes('👾') ? badge.split(' ').find(part => part.includes('👑') || part.includes('😂') || part.includes('💀') || part.includes('🔥') || part.includes('👾')) : '🏆'}</div>
+                    <div class="badge-name">${badge}</div>
+                    <div class="badge-price">${isOwned ? 'Owned' : price + ' coins'}</div>
+                    <div class="badge-actions">
+                        ${!isOwned ? `<button class="badge-btn primary" onclick="purchaseBadge('${badge}')">Purchase</button>` : ''}
+                        ${isOwned && !isEquipped ? `<button class="badge-btn success" onclick="equipBadge('${badge}')">Equip</button>` : ''}
+                        ${isEquipped ? `<button class="badge-btn secondary" onclick="unequipBadge()">Unequip</button>` : ''}
+                    </div>
+                `;
+                
+                badgesGrid.appendChild(badgeItem);
+            });
+        }
+
+        function updateBadgesUI() {
+            populateBadgesGrid();
+        }
+
+        function purchaseBadge(badgeName) {
+            if (!currentUser) return;
+            
+            const price = 400;
+            
+            if ((coinData[currentUser] || 0) < price) {
+                showAuraNotification('Insufficient Coins', `You need ${price} coins to purchase this badge!`, 'error');
+                return;
+            }
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/badges/purchase` : '/api/badges/purchase';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUser,
+                    cost: price,
+                    badge: badgeName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update local coin data
+                    if (data.coinData) {
+                        coinData = data.coinData;
+                    } else {
+                        coinData[currentUser] -= price;
+                    }
+                    updateCoinDisplay();
+                    
+                    // Update purchased badges
+                    if (data.purchasedBadges && data.purchasedBadges[currentUser]) {
+                        purchasedBadges[currentUser] = data.purchasedBadges[currentUser];
+                    } else {
+                        if (!purchasedBadges[currentUser]) {
+                            purchasedBadges[currentUser] = [];
+                        }
+                        purchasedBadges[currentUser].push(badgeName);
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem(`purchasedBadges_${currentUser}`, JSON.stringify(purchasedBadges[currentUser]));
+                    
+                    // Update UI
+                    updateBadgesUI();
+                    updateOwnedBadgesGrid();
+                    
+                    showAuraNotification('Badge Purchased!', `You've purchased ${badgeName} for ${price} coins!`, 'success');
+                } else {
+                    showAuraNotification('Purchase Failed', data.message || 'Failed to purchase badge', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Badge purchase error:', error);
+                showAuraNotification('Purchase Error', 'Failed to connect to server', 'error');
+            });
+        }
+
+        function equipBadge(badgeName) {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/badges/equip` : '/api/badges/equip';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUser,
+                    badge: badgeName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    equippedBadges[currentUser] = badgeName;
+                    localStorage.setItem(`equippedBadges_${currentUser}`, JSON.stringify(badgeName));
+                    
+                    // Update UI
+                    updateBadgesUI();
+                    updateOwnedBadgesGrid();
+                    updateUserCards();
+                    
+                    showAuraNotification('Badge Equipped!', `You've equipped ${badgeName}!`, 'success');
+                } else {
+                    showAuraNotification('Equip Failed', data.message || 'Failed to equip badge', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Badge equip error:', error);
+                showAuraNotification('Equip Error', 'Failed to connect to server', 'error');
+            });
+        }
+
+        function unequipBadge() {
+            if (!currentUser) return;
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/badges/unequip` : '/api/badges/unequip';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUser
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    equippedBadges[currentUser] = null;
+                    localStorage.setItem(`equippedBadges_${currentUser}`, JSON.stringify(null));
+                    
+                    // Update UI
+                    updateBadgesUI();
+                    updateOwnedBadgesGrid();
+                    updateUserCards();
+                    
+                    showAuraNotification('Badge Unequipped', 'You\'ve unequipped your badge!', 'success');
+                } else {
+                    showAuraNotification('Unequip Failed', data.message || 'Failed to unequip badge', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Badge unequip error:', error);
+                showAuraNotification('Unequip Error', 'Failed to connect to server', 'error');
+            });
+        }
+
+        // Refresh aura data from server
+        async function refreshAuraData() {
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            
+            // Use relative URL for reverse proxy, absolute URL otherwise
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/aura` : '/api/aura';
+            
+            try {
+                // Add spinning animation to refresh button
+                const refreshBtn = document.querySelector('.refresh-btn svg');
+                if (refreshBtn) {
+                    refreshBtn.style.animation = 'spin 1s linear infinite';
+                }
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                auraData = data.auraData;
+                dailyAuraData = data.dailyAuraData;
+                coinData = data.coinData;
+                
+                // Update user passwords from server
+                if (data.passwordData) {
+                    Object.keys(data.passwordData).forEach(user => {
+                        userPasswords[user] = data.passwordData[user];
+                    });
+                    console.log('Updated user passwords from server');
+                }
+                
+                // Update all displays
+                updateAllAuraDisplays();
+                updateCoinDisplay();
+                
+                // Show success notification
+                showAuraNotification('Data Refreshed', 'Aura data has been updated from server', 'info');
+                
+            } catch (error) {
+                console.error('Error refreshing aura data:', error);
+                showAuraNotification('Refresh Failed', 'Failed to update aura data from server', 'error');
+            } finally {
+                // Remove spinning animation
+                const refreshBtn = document.querySelector('.refresh-btn svg');
+                if (refreshBtn) {
+                    refreshBtn.style.animation = '';
+                }
+            }
+        }
+        
+        function updateAllAuraDisplays() {
+            Object.keys(auraData).forEach(person => {
+                updateAuraDisplay(person);
+            });
+        }
+        
+        function updateCoinDisplay() {
+            const coinAmountElement = document.getElementById('coinAmount');
+            console.log('updateCoinDisplay called. currentUser:', currentUser, 'coinData:', coinData);
+            if (coinAmountElement && currentUser && coinData[currentUser] !== undefined) {
+                coinAmountElement.textContent = coinData[currentUser];
+                console.log('Updated coin display to:', coinData[currentUser]);
+            } else {
+                console.log('Could not update coin display. Element:', !!coinAmountElement, 'currentUser:', !!currentUser, 'coinData[currentUser]:', coinData[currentUser]);
+            }
+        }
+        
+        // Daily limits
+        const DAILY_POSITIVE_LIMIT = 500;
+        const DAILY_NEGATIVE_LIMIT = -500;
+
+        // Helper function to get current date string
+        function getCurrentDateString() {
+            return new Date().toDateString();
+        }
+
+        // Password Modal Functions
+        function showPasswordModal(userName, userInitial, avatarClass) {
+            currentUser = userName;
+            
+            // Update modal content with user info
+            document.querySelector('.password-user-name').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+            document.querySelector('.password-user-initial').textContent = userInitial;
+            
+            // Update avatar class
+            const avatar = document.querySelector('.password-avatar .avatar-gradient');
+            avatar.className = 'avatar-gradient ' + avatarClass;
+            
+            // Clear previous input and errors
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordError').classList.add('hidden');
+            
+            // Show modal
+            document.getElementById('passwordModal').classList.remove('hidden');
+            
+            // Focus on password input
+            setTimeout(() => {
+                document.getElementById('passwordInput').focus();
+            }, 100);
+        }
+
+        function closePasswordModal() {
+            console.log('Closing password modal, currentUser was:', currentUser);
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordError').classList.add('hidden');
+            // Don't reset currentUser here - it might be needed for login
+            // currentUser = null;
+        }
+
+        function authenticateUser() {
+            const password = document.getElementById('passwordInput').value;
+            console.log('Authenticating user:', currentUser, 'with password:', password);
+            
+            if (!password) {
+                showPasswordError('Please enter a password');
+                return;
+            }
+            
+            if (password === userPasswords[currentUser]) {
+                // Successful login
+                console.log('Authentication successful for:', currentUser);
+                closePasswordModal();
+                loginUser(currentUser);
+            } else {
+                // Failed login
+                console.log('Authentication failed for:', currentUser);
+                showPasswordError('Incorrect password. Please try again.');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        function showPasswordError(message) {
+            const errorElement = document.getElementById('passwordError');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '👁️‍🗨️';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+
+        function handlePasswordKeyPress(event) {
+            if (event.key === 'Enter') {
+                authenticateUser();
+            } else if (event.key === 'Escape') {
+                closePasswordModal();
+            }
+        }
+
+        // Original Functions
+        function loginUser(name) {
+            console.log('Logging in user:', name);
+            
+            // Set current user
+            currentUser = name;
+            
+            // Load purchased backgrounds for this user
+            loadPurchasedBackgrounds();
+            
+            // Load badges data for this user
+            loadPurchasedBadges();
+            loadEquippedBadges();
+            
+            // Load all available badges
+            loadAllBadges();
+            
+            // Start periodic sync for real-time updates
+            startPeriodicSync();
+            
+            // Update dashboard with user info
+            const userInitial = name.charAt(0).toUpperCase();
+            const avatarClass = 'avatar-' + (name === 'max' ? '1' : name === 'sarah' ? '2' : '3');
+            
+            document.querySelector('.user-initial-small').textContent = userInitial;
+            document.querySelector('.user-name-small').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            document.querySelector('.user-avatar-small .avatar-gradient').className = 'avatar-gradient ' + avatarClass;
+            
+            // Switch screens
+            console.log('Switching to dashboard...');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboardScreen').classList.remove('hidden');
+            console.log('Dashboard should now be visible');
+            
+            // Load user's background after switching screens
+            setTimeout(() => {
+                loadSavedBackground();
+                updateCoinDisplay();
+                updateUserCards();
+            }, 100);
+        }
+        
+        function logout() {
+            // Stop periodic sync
+            stopPeriodicSync();
+            
+            // Clear current user
+            currentUser = null;
+            
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+        
+        function updateDailyStatus() {
+            if (!currentUser) return;
+            
+            checkAndResetDailyData();
+            
+            // Calculate total given across all users
+            let totalGiven = 0;
+            let totalTaken = 0;
+            let activeLimits = 0;
+            
+            Object.keys(dailyAuraData[currentUser]).forEach(person => {
+                if (person !== 'date') {
+                    const amount = dailyAuraData[currentUser][person];
+                    if (amount > 0) {
+                        totalGiven += amount;
+                        activeLimits++;
+                    } else if (amount < 0) {
+                        totalTaken += Math.abs(amount);
+                        activeLimits++;
+                    }
+                }
+            });
+            
+            const dailyNetElement = document.getElementById('dailyNet');
+            const dailyLimitsElement = document.getElementById('dailyLimits');
+            
+            if (dailyNetElement) {
+                const netText = `Given: +${totalGiven} | Taken: -${totalTaken}`;
+                dailyNetElement.textContent = netText;
+                dailyNetElement.style.color = 'var(--text-primary)'; // white
+            }
+            
+            if (dailyLimitsElement) {
+                dailyLimitsElement.textContent = `Active: ${activeLimits} users`;
+                dailyLimitsElement.style.color = 'var(--text-secondary)'; // secondary color
+            }
+        }
+        
+        function updateCardLimits() {
+            if (!currentUser) return;
+            
+            checkAndResetDailyData();
+            
+            // Update limit display for each person card
+            ['max', 'gigi', 'marco', 'dezi', 'sevi'].forEach(person => {
+                if (person === currentUser) return; // Skip current user
+                
+                const limitElement = document.getElementById(`limit-${person}`);
+                if (limitElement) {
+                    const currentGiven = dailyAuraData[currentUser][person] || 0;
+                    const remainingPositive = DAILY_POSITIVE_LIMIT - Math.max(0, currentGiven);
+                    const remainingNegative = Math.abs(DAILY_NEGATIVE_LIMIT - Math.min(0, currentGiven));
+                    
+                    let limitText;
+                    if (currentGiven >= 0) {
+                        limitText = `+${remainingPositive} / -${remainingNegative}`;
+                        limitElement.style.color = '#4ade80'; // green for positive
+                    } else {
+                        limitText = `+${remainingPositive} / -${remainingNegative}`;
+                        limitElement.style.color = '#f87171'; // red for negative
+                    }
+                    
+                    limitElement.textContent = limitText;
+                }
+            });
+        }
+        
+        // Activity tracking functions
+        function logActivity(user, target, action) {
+            const timestamp = new Date().toLocaleString();
+            const actionText = action === 'increment' ? 'gave aura to' : 'removed aura from';
+            
+            const activity = {
+                user: user.charAt(0).toUpperCase() + user.slice(1),
+                target: target.charAt(0).toUpperCase() + target.slice(1),
+                action: actionText,
+                timestamp: timestamp,
+                type: action
+            };
+            
+            // Save to server (no localStorage)
+            saveActivityToServer(activity);
+        }
+        
+        function saveActivityToServer(activity) {
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/activity-log` : '/api/activity-log';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ activity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Activity saved to server successfully');
+                } else {
+                    console.error('Failed to save activity to server:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving activity to server:', error);
+            });
+        }
+        
+        async function openRecentActivity() {
+            const activities = await loadActivitiesFromServer();
+            renderActivityList(activities);
+            document.getElementById('recentActivityModal').classList.remove('hidden');
+        }
+        
+        function closeRecentActivity() {
+            document.getElementById('recentActivityModal').classList.add('hidden');
+        }
+        
+        async function loadActivitiesFromServer() {
+            try {
+                const serverUrl = getServerUrl();
+                const protocol = window.location.protocol;
+                const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/activity-log` : '/api/activity-log';
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.activities || [];
+                } else {
+                    console.error('Failed to load activities from server');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error loading activities from server:', error);
+                return [];
+            }
+        }
+        
+        function renderActivityList(activities) {
+            const activityList = document.getElementById('activityList');
+            if (!activityList) {
+                console.error('Activity list element not found');
+                return;
+            }
+            
+            if (activities.length === 0) {
+                activityList.innerHTML = `
+                    <div class="empty-activity">
+                        <div class="empty-activity-icon">?</div>
+                        <h4>No activity yet</h4>
+                        <p>Aura tracker activity will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            activityList.innerHTML = activities.map(activity => `
+                <div class="activity-item ${activity.type}">
+                    <div class="activity-icon">
+                        ${activity.type === 'increment' ? '+' : '-'}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">
+                            <strong>${activity.user}</strong> ${activity.action} <strong>${activity.target}</strong>
+                        </div>
+                        <div class="activity-time">${activity.timestamp}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function clearActivity() {
+            if (confirm('Are you sure you want to clear all activity history?')) {
+                const serverUrl = getServerUrl();
+                const protocol = window.location.protocol;
+                const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/activity-log` : '/api/activity-log';
+                
+                fetch(apiUrl, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderActivityList([]);
+                        showAuraNotification('Activity Cleared', 'All activity history has been cleared', 'info');
+                    } else {
+                        showAuraNotification('Error', 'Failed to clear activity history', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing activity log:', error);
+                    showAuraNotification('Error', 'Failed to clear activity history', 'error');
+                });
+            }
+        }
+        
+        function resetAllCoins() {
+            if (!confirm('Are you sure you want to reset ALL users\' coins to 0? This action cannot be undone.')) {
+                return;
+            }
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/coins/admin/reset` : '/api/coins/admin/reset';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    adminUser: currentUser
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Reset local coin data
+                    Object.keys(coinData).forEach(userId => {
+                        coinData[userId] = 0;
+                    });
+                    updateCoinDisplay();
+                    showAuraNotification('Success', 'All coins have been reset to 0', 'success');
+                } else {
+                    showAuraNotification('Error', data.error || 'Failed to reset coins', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Reset coins error:', error);
+                // Fallback: reset locally if server fails
+                Object.keys(coinData).forEach(userId => {
+                    coinData[userId] = 0;
+                });
+                updateCoinDisplay();
+                showAuraNotification('Local Reset', 'All coins have been reset to 0 (local only)', 'warning');
+            });
+        }
+        
+        function openApp(app) {
+            if (app === 'aura-tracker') {
+                // Load fresh data from server when opening the app
+                refreshAuraData();
+                
+                // Disable buttons for current user's card
+                updateCardButtonStates();
+                
+                // Show/hide aura control button based on user
+                const auraControlBtn = document.getElementById('auraControlBtn');
+                if (currentUser === 'max') {
+                    auraControlBtn.style.display = 'flex';
+                } else {
+                    auraControlBtn.style.display = 'none';
+                }
+                
+                // Hide dashboard and show Aura Tracker screen
+                document.getElementById('dashboardScreen').classList.add('hidden');
+                document.getElementById('auraTrackerScreen').classList.remove('hidden');
+            } else if (app === 'aura-flow') {
+                // Open Aura Flow
+                openAuraFlow();
+            } else if (app === 'photos') {
+                alert('Photos app coming soon!');
+            } else {
+                alert('Opening ' + app + '...');
+            }
+        }
+        
+        function closeApp(app) {
+            if (app === 'aura-tracker') {
+                // Hide Aura Tracker and show dashboard
+                document.getElementById('auraTrackerScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+            } else if (app === 'aura-flow') {
+                // Close Aura Flow
+                closeAuraFlow();
+            }
+        }
+        
+        function selectPerson(person) {
+            alert('Selected: ' + person.charAt(0).toUpperCase() + person.slice(1));
+        }
+        
+        function updateAuraDisplay(person) {
+            const personCard = document.querySelector(`[onclick="selectPerson('${person}')"]`);
+            if (personCard) {
+                const auraNumberElement = personCard.querySelector('.aura-number');
+                if (auraNumberElement) {
+                    auraNumberElement.textContent = auraData[person];
+                }
+            }
+        }
+        
+        function cardAction(person, action) {
+            // Prevent users from modifying their own aura
+            if (person === currentUser) {
+                showAuraNotification('Access Denied', 'You cannot modify your own aura points!', 'error');
+                return;
+            }
+            
+            // Check if WebSocket is available
+            if (!window.auraWS || !window.auraWS.isReady()) {
+                showAuraNotification('Connection Error', 'WebSocket not connected. Please refresh the page.', 'error');
+                return;
+            }
+            
+            // Log activity
+            logActivity(currentUser, person, action);
+            
+            // Send update via WebSocket
+            const success = window.auraWS.updateAura(person, action, currentUser);
+            
+            if (!success) {
+                showAuraNotification('Connection Error', 'Failed to send aura update. Please try again.', 'error');
+                return;
+            }
+            
+            // Add visual feedback immediately (optimistic UI)
+            const personCard = document.querySelector(`[onclick="selectPerson('${person}')"]`);
+            if (personCard) {
+                personCard.classList.add('aura-updated');
+                setTimeout(() => {
+                    personCard.classList.remove('aura-updated');
+                }, 300);
+            }
+        }
+        
+        function checkAndResetDailyData() {
+            const today = getCurrentDateString();
+            
+            // Check if it's a new day for current user
+            if (dailyAuraData[currentUser].date !== today) {
+                // Reset daily data for current user (reset all per-user limits)
+                const resetData = { date: today };
+                Object.keys(dailyAuraData[currentUser]).forEach(key => {
+                    if (key !== 'date') {
+                        resetData[key] = 0;
+                    }
+                });
+                dailyAuraData[currentUser] = resetData;
+                
+                // Save the reset data
+                localStorage.setItem('dailyAuraData', JSON.stringify(dailyAuraData));
+            }
+        }
+        
+        // Add spinning animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        function updateCardButtonStates() {
+            // Enable all buttons first
+            document.querySelectorAll('.card-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            });
+            
+            // Disable buttons for current user's card
+            if (currentUser) {
+                const currentUserCard = document.querySelector(`[onclick="selectPerson('${currentUser}')"]`);
+                if (currentUserCard) {
+                    const buttons = currentUserCard.querySelectorAll('.card-btn');
+                    buttons.forEach(btn => {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.3';
+                        btn.style.cursor = 'not-allowed';
+                    });
+                }
+            }
+        }
+        
+        function showAuraNotification(title, message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            
+            // Clear any existing notifications
+            container.innerHTML = '';
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `aura-notification ${type}`;
+            notification.innerHTML = `
+                <h4>${title}</h4>
+                <p>${message}</p>
+            `;
+            
+            // Add to container
+            container.appendChild(notification);
+            
+            // Show container
+            container.classList.add('show');
+            
+            // Animate notification in
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Hide container after 3 seconds
+            setTimeout(() => {
+                container.classList.remove('show');
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 300);
+            }, 3000);
+        }
+        
+        function testConnection() {
+            console.log('=== CONNECTION TEST ===');
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = `${protocol}//${serverUrl}/api/aura`;
+            
+            console.log('Testing connection to:', apiUrl);
+            
+            // Test GET request first
+            fetch(apiUrl)
+                .then(response => {
+                    console.log('GET Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('GET Response data:', data);
+                    
+                    // Test POST request
+                    return fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            person: 'test',
+                            action: 'test',
+                            currentUser: 'test'
+                        })
+                    });
+                })
+                .then(response => {
+                    console.log('POST Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('POST Response data:', data);
+                    showAuraNotification('Connection Test', 'API connection successful!', 'info');
+                })
+                .catch(error => {
+                    console.error('Connection test failed:', error);
+                    showAuraNotification('Connection Test Failed', 'API connection failed. Check console for details.', 'error');
+                });
+        }
+        
+        function viewDetails() {
+            testConnection();
+        }
+        
+        // Marketplace Functions
+        function openMarketplace() {
+            // Update gem count
+            const gemCountElement = document.getElementById('gemCount');
+            if (gemCountElement && currentUser) {
+                const userAura = auraData[currentUser] || 0;
+                gemCountElement.textContent = userAura;
+            }
+            
+            // Sync purchased backgrounds when opening marketplace
+            syncPurchasedBackgrounds();
+            syncPurchasedBadges();
+            syncEquippedBadges();
+            
+            // Load all badges if not already loaded
+            if (allBadges.length === 0) {
+                loadAllBadges();
+            } else {
+                updateBadgesUI();
+            }
+            
+            document.getElementById('marketplaceModal').classList.remove('hidden');
+        }
+
+        function updateUserCards() {
+            // Update all user cards to show equipped badges
+            const users = ['max', 'gigi', 'marco', 'dezi', 'sevi'];
+            
+            users.forEach(userId => {
+                const userCard = document.querySelector(`[data-user="${userId}"]`);
+                if (!userCard) return;
+                
+                // Remove existing badge display
+                const existingBadge = userCard.querySelector('.user-badge');
+                if (existingBadge) {
+                    existingBadge.remove();
+                }
+                
+                // Add equipped badge if exists
+                if (equippedBadges[userId]) {
+                    const badgeElement = document.createElement('div');
+                    badgeElement.className = 'user-badge';
+                    badgeElement.textContent = equippedBadges[userId];
+                    
+                    // Insert badge after user status
+                    const userStatus = userCard.querySelector('.user-status');
+                    if (userStatus) {
+                        userStatus.parentNode.insertBefore(badgeElement, userStatus.nextSibling);
+                    }
+                }
+            });
+        }
+        
+        function closeMarketplace() {
+            document.getElementById('marketplaceModal').classList.add('hidden');
+        }
+        
+        function switchTab(tabName) {
+            // Remove active class from all tabs and panes
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to selected tab and pane
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Pane').classList.add('active');
+        }
+
+        function switchLockerTab(tabName) {
+            // Remove active class from all locker tabs and panes
+            document.querySelectorAll('.locker-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.locker-tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to selected tab and pane
+            document.getElementById('locker' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Tab').classList.add('active');
+            document.getElementById('locker' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Pane').classList.add('active');
+            
+            // Update content when switching to owned badges
+            if (tabName === 'badges') {
+                updateOwnedBadgesGrid();
+            }
+        }
+
+        function updateOwnedBadgesGrid() {
+            const ownedBadgesGrid = document.getElementById('ownedBadgesGrid');
+            const emptyOwnedBadges = document.getElementById('emptyOwnedBadges');
+            
+            if (!ownedBadgesGrid) return;
+            
+            const userBadges = purchasedBadges[currentUser] || [];
+            
+            if (userBadges.length === 0) {
+                ownedBadgesGrid.style.display = 'none';
+                emptyOwnedBadges.style.display = 'block';
+                return;
+            }
+            
+            ownedBadgesGrid.style.display = 'grid';
+            emptyOwnedBadges.style.display = 'none';
+            ownedBadgesGrid.innerHTML = '';
+            
+            userBadges.forEach(badge => {
+                const isEquipped = equippedBadges[currentUser] === badge;
+                
+                const badgeItem = document.createElement('div');
+                badgeItem.className = `owned-badge-item ${isEquipped ? 'equipped' : ''}`;
+                
+                badgeItem.innerHTML = `
+                    <div class="owned-badge-icon">${badge.includes('👑') || badge.includes('😂') || badge.includes('💀') || badge.includes('🔥') || badge.includes('👾') ? badge.split(' ').find(part => part.includes('👑') || part.includes('😂') || part.includes('💀') || part.includes('🔥') || part.includes('👾')) : '🏆'}</div>
+                    <div class="owned-badge-name">${badge}</div>
+                    <div class="owned-badge-actions">
+                        ${!isEquipped ? `<button class="owned-badge-btn success" onclick="equipBadge('${badge}')">Equip</button>` : ''}
+                        ${isEquipped ? `<button class="owned-badge-btn secondary" onclick="unequipBadge()">Unequip</button>` : ''}
+                    </div>
+                `;
+                
+                ownedBadgesGrid.appendChild(badgeItem);
+            });
+        }
+        
+        function selectBackground(bgName) {
+            console.log('selectBackground called with:', bgName);
+            
+            // Check if user is logged in
+            if (!currentUser) {
+                showAuraNotification('Login Required', 'Please login to purchase backgrounds', 'error');
+                return;
+            }
+            
+            // Check if user has already purchased this background
+            if (purchasedBackgrounds[currentUser] && purchasedBackgrounds[currentUser].includes(bgName)) {
+                // User already owns this background, apply it directly
+                applyBackground(bgName);
+                return;
+            }
+            
+            // Check if user has enough coins (100 coins required)
+            if (coinData[currentUser] < 100) {
+                showAuraNotification('Insufficient Coins', 'You need 100 coins to purchase this background', 'error');
+                return;
+            }
+            
+            // Purchase the background
+            purchaseBackground(bgName);
+        }
+        
+        function purchaseBackground(bgName) {
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/coins/purchase` : '/api/coins/purchase';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUser,
+                    cost: 100,
+                    item: bgName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update local coin data from server response
+                    if (data.coinData) {
+                        coinData = data.coinData;
+                    } else {
+                        coinData[currentUser] -= 100;
+                    }
+                    updateCoinDisplay();
+                    
+                    // Add to purchased backgrounds from server response
+                    if (data.purchasedBackgrounds && data.purchasedBackgrounds[currentUser]) {
+                        purchasedBackgrounds[currentUser] = data.purchasedBackgrounds[currentUser];
+                    } else {
+                        if (!purchasedBackgrounds[currentUser]) {
+                            purchasedBackgrounds[currentUser] = [];
+                        }
+                        if (!purchasedBackgrounds[currentUser].includes(bgName)) {
+                            purchasedBackgrounds[currentUser].push(bgName);
+                        }
+                    }
+                    
+                    // Save purchased backgrounds to localStorage
+                    localStorage.setItem(`purchasedBackgrounds_${currentUser}`, JSON.stringify(purchasedBackgrounds[currentUser]));
+                    
+                    // Apply the background
+                    applyBackground(bgName);
+                    
+                    // Update marketplace UI to show as owned
+                    updateMarketplaceUI();
+                    
+                    showAuraNotification('Purchase Successful', `Background purchased for 100 coins!`, 'success');
+                } else {
+                    showAuraNotification('Purchase Failed', data.error || 'Failed to purchase background', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Purchase error:', error);
+                showAuraNotification('Purchase Error', 'Failed to connect to server', 'error');
+            });
+        }
+        
+        function applyBackground(bgName) {
+            // Apply the selected background
+            const background = document.querySelector('.background');
+            console.log('Background element found:', !!background);
+            
+            if (!background) {
+                console.error('Background element not found!');
+                return;
+            }
+            
+            // Apply new background with !important to override CSS
+            switch(bgName) {
+                case 'gradient1':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 'important');
+                    break;
+                case 'gradient2':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', 'important');
+                    break;
+                case 'gradient3':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #1b5e20 0%, #004d40 100%)', 'important');
+                    break;
+                case 'gradient4':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', 'important');
+                    break;
+                case 'gradient5':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', 'important');
+                    break;
+                case 'gradient6':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', 'important');
+                    break;
+                case 'gradient7':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #4a148c 0%, #880e4f 100%)', 'important');
+                    break;
+                case 'gradient8':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)', 'important');
+                    break;
+                case 'gradient9':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #01579b 0%, #004d40 100%)', 'important');
+                    break;
+                case 'gradient10':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #b71c1c 0%, #880e4f 100%)', 'important');
+                    break;
+                case 'gradient11':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #1b5e20 0%, #004d40 100%)', 'important');
+                    break;
+                case 'gradient12':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #a8caba 0%, #5d4157 100%)', 'important');
+                    break;
+                case 'gradient13':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #ff6f00 0%, #bf360c 100%)', 'important');
+                    break;
+                case 'gradient14':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #1a237e 0%, #283593 100%)', 'important');
+                    break;
+                case 'gradient15':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #667db6 0%, #0082c8 100%)', 'important');
+                    break;
+                case 'gradient16':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #f83600 0%, #f9d423 100%)', 'important');
+                    break;
+                case 'gradient17':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)', 'important');
+                    break;
+                case 'gradient18':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #bf360c 0%, #e65100 100%)', 'important');
+                    break;
+                case 'gradient19':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #0d47a1 0%, #1565c0 100%)', 'important');
+                    break;
+                case 'gradient20':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', 'important');
+                    break;
+                case 'gradient21':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)', 'important');
+                    break;
+                case 'gradient22':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #870000 0%, #190a05 100%)', 'important');
+                    break;
+                case 'gradient23':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #0d47a1 0%, #01579b 100%)', 'important');
+                    break;
+                case 'gradient24':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)', 'important');
+                    break;
+                case 'gradient25':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #ff6b35 0%, #f77737 100%)', 'important');
+                    break;
+                case 'gradient26':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', 'important');
+                    break;
+                case 'gradient27':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #434343 0%, #000000 100%)', 'important');
+                    break;
+                case 'gradient28':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)', 'important');
+                    break;
+                case 'gradient29':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #ff0084 0%, #33001b 100%)', 'important');
+                    break;
+                case 'gradient30':
+                    background.style.setProperty('background', 'linear-gradient(135deg, #004d40 0%, #00695c 100%)', 'important');
+                    break;
+            }
+            
+            // Save to localStorage per user
+            try {
+                const storageKey = `selectedBackground_${currentUser}`;
+                localStorage.setItem(storageKey, bgName);
+                console.log('Background saved to localStorage for user', currentUser, ':', bgName);
+                
+                // Verify it was saved
+                const verify = localStorage.getItem(storageKey);
+                console.log('Verification - saved background:', verify);
+            } catch (error) {
+                console.error('Error saving to localStorage:', error);
+            }
+            
+            showAuraNotification('Background Changed', 'Your background has been saved!', 'success');
+        }
+        
+        function loadSavedBackground() {
+            console.log('loadSavedBackground called for user:', currentUser);
+            
+            if (!currentUser) {
+                console.log('No current user, skipping background load');
+                return;
+            }
+            
+            try {
+                const storageKey = `selectedBackground_${currentUser}`;
+                const savedBg = localStorage.getItem(storageKey);
+                console.log('Saved background from localStorage for user', currentUser, ':', savedBg);
+                
+                if (savedBg) {
+                    console.log('Found saved background, applying:', savedBg);
+                    selectBackground(savedBg);
+                } else {
+                    console.log('No saved background found for user:', currentUser);
+                }
+            } catch (error) {
+                console.error('Error loading from localStorage:', error);
+            }
+        }
+        
+        // Aura Control Functions
+        function openAuraControl() {
+            if (currentUser !== 'max') {
+                showAuraNotification('Access Denied', 'Only Max can access aura control', 'error');
+                return;
+            }
+            
+            document.getElementById('auraControlModal').classList.remove('hidden');
+        }
+        
+        function closeAuraControl() {
+            document.getElementById('auraControlModal').classList.add('hidden');
+        }
+        
+        function refreshAuraControl() {
+            refreshAuraData().then(() => {
+                showAuraNotification('Data Refreshed', 'Aura data has been updated', 'info');
+            });
+        }
+        
+        function resetAllAura() {
+            if (!confirm('Are you sure you want to reset ALL users\' aura to 0? This action cannot be undone.')) {
+                return;
+            }
+            
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/aura/admin/reset` : '/api/aura/admin/reset';
+            
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    adminUser: currentUser
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Reset local data
+                    Object.keys(auraData).forEach(userId => {
+                        auraData[userId] = 0;
+                        updateAuraDisplay(userId);
+                    });
+                    loadAuraControls();
+                    showAuraNotification('Success', 'All aura has been reset to 0', 'success');
+                } else {
+                    showAuraNotification('Error', data.error || 'Failed to reset aura', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Reset aura error:', error);
+                // Fallback: reset locally if server fails
+                Object.keys(auraData).forEach(userId => {
+                    auraData[userId] = 0;
+                    updateAuraDisplay(userId);
+                });
+                loadAuraControls();
+                showAuraNotification('Local Reset', 'All aura has been reset to 0 (local only)', 'warning');
+            });
+        }
+        
+        // Initialize event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            testConnection();
+            
+            // Load initial data including passwords
+            loadInitialData();
+            
+            // Load initial coin data
+            refreshAuraData();
+            
+            // Load equipped badges data for all users before updating UI
+            Object.keys(equippedBadges).forEach(userId => {
+                try {
+                    const saved = localStorage.getItem(`equippedBadges_${userId}`);
+                    if (saved) {
+                        equippedBadges[userId] = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error(`Error loading equipped badge for ${userId}:`, error);
+                }
+            });
+            
+            // Initialize user cards with badges
+            updateUserCards();
+            
+            // Close modal when clicking outside
+            document.addEventListener('click', function(event) {
+                const modal = document.getElementById('passwordModal');
+                if (event.target === modal) {
+                    closePasswordModal();
+                }
+            });
+            
+            // Prevent modal content clicks from closing modal
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+            }
+        });
+        
+        // User Edit Modal Functions
+        function openUserEditModal() {
+            // Only allow admin users (max) to access this
+            if (currentUser !== 'max') {
+                showAuraNotification('Access Denied', 'Only admin users can edit all users', 'error');
+                return;
+            }
+            
+            // Load current user data into the modal
+            ['max', 'gigi', 'marco', 'dezi', 'sevi'].forEach(user => {
+                const auraInput = document.getElementById(`edit-${user}-aura`);
+                const coinInput = document.getElementById(`edit-${user}-coins`);
+                
+                if (auraInput) auraInput.value = auraData[user] || 0;
+                if (coinInput) coinInput.value = coinData[user] || 0;
+            });
+            
+            // Show the modal
+            const modal = document.getElementById('userEditModal');
+            modal.classList.remove('hidden');
+        }
+        
+        function closeUserEditModal() {
+            const modal = document.getElementById('userEditModal');
+            modal.classList.add('hidden');
+        }
+        
+        // Export Data Function
+        async function exportData() {
+            console.log('Export button clicked!');
+            try {
+                const serverUrl = getServerUrl();
+                const protocol = window.location.protocol;
+                const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/export-data` : '/api/export-data';
+                
+                console.log('Attempting export to:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                console.log('Response status:', response.status);
+                
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (result.success) {
+                    // Create JSON blob and download
+                    const dataStr = JSON.stringify(result.data, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `aura-hub-backup-${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showAuraNotification('Export Successful', 'Data exported successfully', 'success');
+                } else {
+                    showAuraNotification('Export Failed', result.error || 'Failed to export data', 'error');
+                }
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showAuraNotification('Export Error', 'Failed to export data', 'error');
+            }
+        }
+        
+        // Import Data Function
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // Validate import data
+                if (!data.auraData || !data.dailyAuraData || !data.coinData) {
+                    showAuraNotification('Import Error', 'Invalid backup file format', 'error');
+                    return;
+                }
+                
+                // Confirm import
+                const confirmMessage = `This will overwrite all current data with the backup from ${data.exportDate || 'unknown date'}. Continue?`;
+                if (!confirm(confirmMessage)) {
+                    return;
+                }
+                
+                const serverUrl = getServerUrl();
+                const protocol = window.location.protocol;
+                const apiUrl = serverUrl ? `${protocol}//${serverUrl}/api/import-data` : '/api/import-data';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAuraNotification('Import Successful', `Data imported successfully. Imported: ${result.importedFields.join(', ')}`, 'success');
+                    
+                    // Refresh data after import
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    showAuraNotification('Import Failed', result.error || 'Failed to import data', 'error');
+                }
+            } catch (error) {
+                console.error('Error importing data:', error);
+                showAuraNotification('Import Error', 'Failed to import data', 'error');
+            }
+            
+            // Clear file input
+            event.target.value = '';
+        }
+        
+        function openMarketplace() {
+            const modal = document.getElementById('marketplaceModal');
+            modal.classList.remove('hidden');
+            
+            // Update UI to show owned backgrounds
+            updateMarketplaceUI();
+        }
+        
+        function updateMarketplaceUI() {
+            if (!currentUser || !purchasedBackgrounds[currentUser]) return;
+            
+            const ownedBackgrounds = purchasedBackgrounds[currentUser];
+            
+            // Update each background option
+            for (let i = 1; i <= 30; i++) {
+                const bgName = `gradient${i}`;
+                const bgOption = document.querySelector(`[onclick="selectBackground('${bgName}')"]`);
+                
+                if (bgOption) {
+                    if (ownedBackgrounds.includes(bgName)) {
+                        bgOption.classList.add('owned');
+                        // Update onclick to apply directly instead of purchasing
+                        bgOption.setAttribute('onclick', `applyBackground('${bgName}')`);
+                        bgOption.setAttribute('title', 'Already owned - Click to apply');
+                    } else {
+                        bgOption.classList.remove('owned');
+                        // Update onclick to purchase
+                        bgOption.setAttribute('onclick', `selectBackground('${bgName}')`);
+                        bgOption.setAttribute('title', 'Click to purchase for 100 coins');
+                    }
+                }
+            }
+            
+            // Update locker content
+            updateLockerContent();
+        }
+        
+        function updateLockerContent() {
+            if (!currentUser || !purchasedBackgrounds[currentUser]) {
+                document.getElementById('emptyLocker').style.display = 'block';
+                document.getElementById('lockerGrid').style.display = 'none';
+                return;
+            }
+            
+            const ownedBackgrounds = purchasedBackgrounds[currentUser];
+            const lockerGrid = document.getElementById('lockerGrid');
+            const emptyLocker = document.getElementById('emptyLocker');
+            
+            if (ownedBackgrounds.length === 0) {
+                emptyLocker.style.display = 'block';
+                lockerGrid.style.display = 'none';
+                return;
+            }
+            
+            emptyLocker.style.display = 'none';
+            lockerGrid.style.display = 'grid';
+            lockerGrid.innerHTML = '';
+            
+            // Background names and titles
+            const backgroundInfo = {
+                'gradient1': 'Ocean Blue',
+                'gradient2': 'Sunset Purple',
+                'gradient3': 'Dark Forest',
+                'gradient4': 'Galaxy Dark',
+                'gradient5': 'Golden Hour',
+                'gradient6': 'Rose Pink',
+                'gradient7': 'Deep Purple',
+                'gradient8': 'Fire Orange',
+                'gradient9': 'Dark Ocean',
+                'gradient10': 'Ruby Red',
+                'gradient11': 'Forest Night',
+                'gradient12': 'Wine Red',
+                'gradient13': 'Sunset Blaze',
+                'gradient14': 'Midnight Blue',
+                'gradient15': 'Deep Ocean',
+                'gradient16': 'Coral Reef',
+                'gradient17': 'Midnight Sky',
+                'gradient18': 'Dark Sunset',
+                'gradient19': 'Deep Blue',
+                'gradient20': 'Sunset Gold',
+                'gradient21': 'Emerald Forest',
+                'gradient22': 'Ruby Red',
+                'gradient23': 'Navy Blue',
+                'gradient24': 'Violet Purple',
+                'gradient25': 'Autumn Leaves',
+                'gradient26': 'Cotton Candy',
+                'gradient27': 'Storm Gray',
+                'gradient28': 'Dark Green',
+                'gradient29': 'Hot Pink',
+                'gradient30': 'Dark Teal'
+            };
+            
+            // Add each purchased background to the locker
+            ownedBackgrounds.forEach(bgName => {
+                const bgInfo = backgroundInfo[bgName];
+                if (!bgInfo) return;
+                
+                const lockerItem = document.createElement('div');
+                lockerItem.className = 'locker-item';
+                lockerItem.setAttribute('onclick', `applyBackground('${bgName}')`);
+                lockerItem.setAttribute('title', `Apply ${bgInfo}`);
+                
+                lockerItem.innerHTML = `
+                    <div class="locker-preview gradient-preview-${bgName.replace('gradient', '')} animated-bg-${bgName.replace('gradient', '')}"></div>
+                    <p>${bgInfo}</p>
+                    <span class="owned-badge">OWNED</span>
+                `;
+                
+                lockerGrid.appendChild(lockerItem);
+            });
+        }
+        
+        function saveAllUsers() {
+            const users = ['max', 'gigi', 'marco', 'dezi', 'sevi'];
+            const updates = {};
+            
+            // Collect all the changes
+            users.forEach(user => {
+                const auraInput = document.getElementById(`edit-${user}-aura`);
+                const coinInput = document.getElementById(`edit-${user}-coins`);
+                const passwordInput = document.getElementById(`edit-${user}-password`);
+                
+                if (auraInput && coinInput) {
+                    updates[user] = {
+                        aura: parseInt(auraInput.value) || 0,
+                        coins: parseInt(coinInput.value) || 0,
+                        password: passwordInput ? passwordInput.value : null
+                    };
+                }
+            });
+            
+            // Update each user individually using the existing admin APIs
+            const serverUrl = getServerUrl();
+            const protocol = window.location.protocol;
+            const promises = [];
+            
+            users.forEach(user => {
+                if (updates[user]) {
+                    // Update aura if changed
+                    if (updates[user].aura !== undefined) {
+                        const auraApiUrl = serverUrl ? `${protocol}//${serverUrl}/api/aura/admin` : '/api/aura/admin';
+                        
+                        const auraPromise = fetch(auraApiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                adminUser: currentUser,
+                                userId: user,
+                                auraValue: updates[user].aura
+                            })
+                        });
+                        
+                        promises.push(auraPromise);
+                    }
+                    
+                    // Update coins if changed
+                    if (updates[user].coins !== undefined) {
+                        const coinApiUrl = serverUrl ? `${protocol}//${serverUrl}/api/coins/admin` : '/api/coins/admin';
+                        const coinPayload = {
+                            adminUser: currentUser,
+                            userId: user,
+                            coinValue: updates[user].coins
+                        };
+                        
+                        const coinPromise = fetch(coinApiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(coinPayload)
+                        }).then(response => response.json())
+                        .catch(error => {
+                            console.error(`Coin update error for ${user}:`, error);
+                            throw error;
+                        });
+                        
+                        promises.push(coinPromise);
+                    }
+                    
+                    // Update password if changed
+                    if (updates[user].password && updates[user].password.trim()) {
+                        const passwordApiUrl = serverUrl ? `${protocol}//${serverUrl}/api/passwords/admin` : '/api/passwords/admin';
+                        const passwordPayload = {
+                            adminUser: currentUser,
+                            userId: user,
+                            newPassword: updates[user].password
+                        };
+                        
+                        const passwordPromise = fetch(passwordApiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(passwordPayload)
+                        }).then(response => response.json())
+                        .catch(error => {
+                            console.error(`Password update error for ${user}:`, error);
+                            throw error;
+                        });
+                        
+                        promises.push(passwordPromise);
+                    }
+                }
+            });
+            
+            // Wait for all updates to complete
+            Promise.all(promises)
+            .then(responses => Promise.all(responses.map(r => r.json())))
+            .then(results => {
+                // Check if all updates were successful
+                const allSuccessful = results.every(result => result.success);
+                
+                if (allSuccessful) {
+                    // Update local data
+                    Object.keys(updates).forEach(user => {
+                        if (updates[user].aura !== undefined) {
+                            auraData[user] = updates[user].aura;
+                            updateAuraDisplay(user);
+                        }
+                        if (updates[user].coins !== undefined) {
+                            coinData[user] = updates[user].coins;
+                        }
+                        if (updates[user].password && updates[user].password.trim()) {
+                            userPasswords[user] = updates[user].password;
+                        }
+                    });
+                    
+                    // Refresh displays
+                    refreshAuraData();
+                    updateCoinDisplay();
+                    
+                    // Close modal and show success
+                    closeUserEditModal();
+                    showAuraNotification('Success', 'All user data has been updated', 'success');
+                } else {
+                    showAuraNotification('Error', 'Some updates failed', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Update users error:', error);
+                // Fallback: update locally if server fails
+                Object.keys(updates).forEach(user => {
+                    if (updates[user].aura !== undefined) {
+                        auraData[user] = updates[user].aura;
+                        updateAuraDisplay(user);
+                    }
+                    if (updates[user].coins !== undefined) {
+                        coinData[user] = updates[user].coins;
+                    }
+                    if (updates[user].password && updates[user].password.trim()) {
+                        userPasswords[user] = updates[user].password;
+                    }
+                });
+                
+                refreshAuraData();
+                updateCoinDisplay();
+                closeUserEditModal();
+                showAuraNotification('Local Update', 'User data updated locally only', 'warning');
+            });
+        }
+        
+        // Aura Flow functionality
+        let auraFlow = null;
+
+        // Aura Flow class
+        class AuraFlow {
+            constructor() {
+                this.currentView = 'feed';
+                this.posts = [];
+                this.shorts = [];
+                this.currentUser = null;
+                this.init();
+            }
+
+            init() {
+                this.loadContent();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // View switching
+                document.getElementById('feedBtn')?.addEventListener('click', () => this.switchView('feed'));
+                document.getElementById('shortsBtn')?.addEventListener('click', () => this.switchView('shorts'));
+            }
+
+            switchView(view) {
+                // Update navigation
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`${view}Btn`).classList.add('active');
+
+                // Update views
+                document.querySelectorAll('.flow-view').forEach(v => v.classList.remove('active'));
+                document.getElementById(`${view}View`).classList.add('active');
+
+                this.currentView = view;
+            }
+
+            loadContent() {
+                // Load posts from server instead of localStorage
+                fetch('/api/posts')
+                    .then(response => response.json())
+                    .then(posts => {
+                        this.posts = posts.length > 0 ? posts : this.generateSamplePosts();
+                        this.shorts = []; // Shorts still from localStorage for now
+                        
+                        // Debug: Log loaded posts to verify all posts are loaded
+                        console.log('Loaded posts for user:', currentUser, 'Total posts:', this.posts.length);
+                        console.log('Posts:', this.posts);
+                        
+                        // Load actual comment counts for each post
+                        this.loadCommentCountsForAllPosts()
+                            .then(() => {
+                                this.renderFeed();
+                                this.renderShorts();
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error loading posts from server:', error);
+                        // Fallback to localStorage if server fails
+                        const savedPosts = localStorage.getItem('auraFlow_posts');
+                        const savedShorts = localStorage.getItem('auraFlow_shorts');
+                        
+                        this.posts = savedPosts ? JSON.parse(savedPosts) : this.generateSamplePosts();
+                        this.shorts = savedShorts ? JSON.parse(savedShorts) : [];
+                        
+                        // Load actual comment counts for each post in fallback case too
+                        this.loadCommentCountsForAllPosts()
+                            .then(() => {
+                                this.renderFeed();
+                                this.renderShorts();
+                            });
+                    });
+            }
+
+            generateSamplePosts() {
+                return [
+                    {
+                        id: 1,
+                        user: 'Max',
+                        avatar: 'M',
+                        gradient: 'avatar-1',
+                        time: '2 hours ago',
+                        text: 'Welcome to Aura Flow! This is our new family social hub where we can share posts and videos with each other. 🌊',
+                        likes: 5,
+                        comments: 2,
+                        liked: false
+                    },
+                    {
+                        id: 2,
+                        user: 'Gigi',
+                        avatar: 'G',
+                        gradient: 'avatar-2',
+                        time: '4 hours ago',
+                        text: 'Had an amazing day today! Who else loves weekend? 😊',
+                        likes: 8,
+                        comments: 3,
+                        liked: false
+                    },
+                    {
+                        id: 3,
+                        user: 'Marco',
+                        avatar: 'M',
+                        gradient: 'avatar-3',
+                        time: '6 hours ago',
+                        text: 'Check out this beautiful sunset I captured!',
+                        image: 'https://picsum.photos/seed/sunset/400/300.jpg',
+                        likes: 12,
+                        comments: 4,
+                        liked: false
+                    }
+                ];
+            }
+
+            renderFeed() {
+                const feedContainer = document.getElementById('feedContainer');
+                if (!feedContainer) return;
+
+                if (this.posts.length === 0) {
+                    feedContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <h4>No posts yet</h4>
+                            <p>Be the first to share something!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                feedContainer.innerHTML = this.posts.map(post => this.createPostHTML(post)).join('');
+                this.attachPostEventListeners();
+            }
+
+            createPostHTML(post) {
+                let contentHTML = '';
+                
+                if (post.type === 'text') {
+                    contentHTML = `<div class="post-text">${post.text}</div>`;
+                } else if (post.type === 'image') {
+                    contentHTML = `
+                        <div class="post-text">${post.text}</div>
+                        <img src="${post.image}" alt="Post image" class="post-image" onclick="openImageModal('${post.image}')">
+                    `;
+                } else if (post.type === 'poll') {
+                    contentHTML = `
+                        <div class="post-text">${post.poll.question}</div>
+                        ${this.createPollHTML(post.poll)}
+                    `;
+                } else {
+                    // Fallback for old format
+                    contentHTML = `
+                        <div class="post-text">${post.text}</div>
+                        ${post.image ? `<img src="${post.image}" alt="Post image" class="post-image" onclick="openImageModal('${post.image}')">` : ''}
+                        ${post.poll ? this.createPollHTML(post.poll) : ''}
+                    `;
+                }
+                
+                return `
+                    <div class="post-card" data-post-id="${post.id}">
+                        <div class="post-header">
+                            <div class="post-avatar ${post.gradient}">
+                                <span>${post.avatar}</span>
+                            </div>
+                            <div class="post-user-info">
+                                <div class="post-username">${post.user}</div>
+                                <div class="post-time">${post.time}</div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            ${contentHTML}
+                        </div>
+                        <div class="post-actions">
+                            <button class="post-action-btn ${(post.userLikes && post.userLikes[currentUser]) ? 'liked' : ''}" onclick="togglePostLike(${post.id})">
+                                <span>${(post.userLikes && post.userLikes[currentUser]) ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</span>
+                                <span>${post.likes}</span>
+                            </button>
+                            <button class="post-action-btn" onclick="openCommentsModal(${post.id})">
+                                <span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+                                <span>${post.comments}</span>
+                            </button>
+                                                    </div>
+                    </div>
+                `;
+            }
+
+            createPollHTML(poll) {
+                const totalVotes = poll.options.reduce((sum, option) => sum + option.votes, 0);
+                
+                return `
+                    <div class="post-poll">
+                        <div class="poll-question">${poll.question}</div>
+                        ${poll.options.map(option => `
+                            <div class="poll-option ${option.selected ? 'selected' : ''}" onclick="window.auraFlow.votePoll(${poll.id}, '${option.text}')">
+                                <div class="poll-bar" style="width: ${totalVotes > 0 ? (option.votes / totalVotes * 100) : 0}%"></div>
+                                <div class="poll-text">${option.text}</div>
+                                ${totalVotes > 0 ? `<div class="poll-percentage">${Math.round(option.votes / totalVotes * 100)}%</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderShorts() {
+                const shortsContainer = document.getElementById('shortsContainer');
+                if (!shortsContainer) return;
+
+                // Show Coming Soon message instead of loading shorts
+                shortsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">???</div>
+                        <h4>Shorts Coming Soon</h4>
+                        <p>TikTok-style video sharing will be available in a future update!</p>
+                    </div>
+                `;
+            }
+
+            createShortHTML(short) {
+                return `
+                    <div class="short-item">
+                        <video class="short-video" src="${short.url}" loop muted></video>
+                        <div class="short-overlay">
+                            <div class="short-info">
+                                <div class="short-username">${short.user}</div>
+                                <div class="short-caption">${short.caption}</div>
+                            </div>
+                            <div class="short-actions">
+                                <button class="short-action-btn ${short.liked ? 'liked' : ''}" onclick="window.auraFlow.toggleShortLike(${short.id})">
+                                    <span>${short.liked ? '❤️' : '🤍'}</span>
+                                </button>
+                                <button class="short-action-btn" onclick="window.auraFlow.openShortComments(${short.id})">
+                                    <span>💬</span>
+                                </button>
+                                <button class="short-action-btn" onclick="window.auraFlow.shareShort(${short.id})">
+                                    <span>📤</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            toggleLike(postId) {
+                const post = this.posts.find(p => p.id === postId);
+                if (!post || !currentUser) return;
+                
+                // Initialize likes object if it doesn't exist
+                if (!post.userLikes) {
+                    post.userLikes = {};
+                }
+                
+                // Initialize userLikes count if it doesn't exist
+                if (!post.likes) {
+                    post.likes = 0;
+                }
+                
+                const wasLiked = post.userLikes[currentUser];
+                post.userLikes[currentUser] = !wasLiked;
+                
+                // Update total likes count based on individual user likes
+                post.likes = Object.keys(post.userLikes).filter(user => post.userLikes[user]).length;
+                
+                // Update liked property for current user display
+                post.liked = post.userLikes[currentUser];
+                
+                this.saveContent();
+                this.renderFeed();
+            }
+
+            toggleShortLike(shortId) {
+                const short = this.shorts.find(s => s.id === shortId);
+                if (!short || !currentUser) return;
+                
+                // Initialize likes object if it doesn't exist
+                if (!short.userLikes) {
+                    short.userLikes = {};
+                }
+                
+                // Initialize userLikes count if it doesn't exist
+                if (!short.likes) {
+                    short.likes = 0;
+                }
+                
+                const wasLiked = short.userLikes[currentUser];
+                short.userLikes[currentUser] = !wasLiked;
+                
+                // Update total likes count based on individual user likes
+                short.likes = Object.keys(short.userLikes).filter(user => short.userLikes[user]).length;
+                
+                // Update liked property for current user display
+                short.liked = short.userLikes[currentUser];
+                
+                this.saveContent();
+                this.renderShorts();
+            }
+
+            votePoll(pollId, optionText) {
+                // Handle poll voting
+                console.log('Voted on poll:', pollId, optionText);
+            }
+
+            openComments(postId) {
+                console.log('Opening comments for post:', postId);
+                
+                // Store current post ID for comment operations
+                this.currentPostId = postId;
+                
+                // Show modal
+                const modal = document.getElementById('commentsModal');
+                modal.classList.remove('hidden');
+                
+                // Load comments for this post
+                this.loadComments(postId);
+                
+                // Focus on comment input
+                setTimeout(() => {
+                    document.getElementById('commentInput').focus();
+                }, 300);
+            }
+
+            openShortComments(shortId) {
+                console.log('Opening comments for short:', shortId);
+            }
+
+            sharePost(postId) {
+                console.log('Sharing post:', postId);
+            }
+            
+            loadComments(postId) {
+                console.log('Loading comments for post:', postId);
+                
+                fetch(`/api/comments/${postId}`)
+                    .then(response => response.json())
+                    .then(comments => {
+                        console.log('Loaded comments:', comments);
+                        this.renderComments(comments);
+                    })
+                    .catch(error => {
+                        console.error('Error loading comments:', error);
+                        this.renderComments([]); // Show empty state on error
+                    });
+            }
+            
+            renderComments(comments) {
+                const container = document.getElementById('commentsContainer');
+                
+                if (comments.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-comments">
+                            <div class="empty-comments-icon">???</div>
+                            <h4>No comments yet</h4>
+                            <p>Be the first to comment!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = comments.map(comment => this.createCommentHTML(comment)).join('');
+            }
+            
+            createCommentHTML(comment) {
+                return `
+                    <div class="comment">
+                        <div class="comment-avatar ${comment.gradient}">
+                            <span>${comment.avatar}</span>
+                        </div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-username">${comment.user}</span>
+                                <span class="comment-time">${comment.time}</span>
+                            </div>
+                            <div class="comment-text">${comment.text}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            updateCommentCount(postId, count) {
+                // Find the post and update its comment count
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    post.comments = count;
+                    // Re-render the feed to update the comment count
+                    this.renderFeed();
+                }
+            }
+
+            loadCommentCountsForAllPosts() {
+                const commentCountPromises = this.posts.map(post => 
+                    fetch(`/api/comments/${post.id}`)
+                        .then(response => response.json())
+                        .then(comments => {
+                            // Update the post's comment count with the actual number of comments
+                            post.comments = comments.length;
+                            console.log(`Updated comment count for post ${post.id}: ${comments.length}`);
+                        })
+                        .catch(error => {
+                            console.error(`Error loading comments for post ${post.id}:`, error);
+                            // Keep the existing comment count if there's an error
+                        })
+                );
+                
+                return Promise.all(commentCountPromises);
+            }
+
+            shareShort(shortId) {
+                console.log('Sharing short:', shortId);
+            }
+
+            saveContent() {
+                console.log('Saving posts to server:', this.posts);
+                
+                // Save posts to server
+                fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ posts: this.posts })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Posts saved to server successfully:', data);
+                    // Also save to localStorage as backup
+                    localStorage.setItem('auraFlow_posts', JSON.stringify(this.posts));
+                    localStorage.setItem('auraFlow_shorts', JSON.stringify(this.shorts));
+                })
+                .catch(error => {
+                    console.error('Error saving posts to server:', error);
+                    // Fallback to localStorage only
+                    localStorage.setItem('auraFlow_posts', JSON.stringify(this.posts));
+                    localStorage.setItem('auraFlow_shorts', JSON.stringify(this.shorts));
+                });
+            }
+
+            attachPostEventListeners() {
+                // Add any additional event listeners for posts
+            }
+
+            refreshFeed() {
+                this.loadContent();
+                this.showNotification('Feed refreshed!', 'success');
+            }
+
+            showNotification(message, type = 'info') {
+                // Show notification to user
+                console.log('Notification:', message, type);
+            }
+        }
+
+  // Initialize Aura Flow when app opens
+function openAuraFlow() {
+    const auraFlowScreen = document.getElementById('auraFlowScreen');
+    const dashboardScreen = document.getElementById('dashboardScreen');
+    
+    // Hide dashboard, show Aura Flow
+    dashboardScreen.classList.add('hidden');
+    auraFlowScreen.classList.remove('hidden');
+    
+    // Add spinning animation to refresh button during initial load
+    const refreshBtn = document.querySelector('.refresh-feed-btn svg');
+    if (refreshBtn) {
+        refreshBtn.style.animation = 'spin 1s linear infinite';
+    }
+    
+    // Always create fresh Aura Flow instance to ensure latest posts are loaded
+    auraFlow = new AuraFlow();
+    
+    // Update user info in header
+    if (currentUser) {
+        const userInitial = document.getElementById('flowUserInitial');
+        const currentUserName = document.getElementById('flowCurrentUser');
+        if (userInitial) userInitial.textContent = currentUser.charAt(0).toUpperCase();
+        if (currentUserName) currentUserName.textContent = currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
+    }
+    
+    // Remove spinning animation after load completes
+    setTimeout(() => {
+        if (refreshBtn) {
+            refreshBtn.style.animation = '';
+        }
+    }, 1500); // Give extra time for initial load
+}
+
+        function closeAuraFlow() {
+            const auraFlowScreen = document.getElementById('auraFlowScreen');
+            const dashboardScreen = document.getElementById('dashboardScreen');
+            
+            auraFlowScreen.classList.add('hidden');
+            dashboardScreen.classList.remove('hidden');
+        }
+
+        function switchFlowView(view) {
+            if (auraFlow) {
+                auraFlow.switchView(view);
+            }
+        }
+
+        function openCreateModal() {
+            const modal = document.getElementById('createModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeCreateModal() {
+            const modal = document.getElementById('createModal');
+            modal.classList.add('hidden');
+        }
+
+        function createPost() {
+            closeCreateModal();
+            openPostCreationModal();
+        }
+
+        // Post creation variables
+        let currentPostType = 'text';
+        let selectedImage = null;
+
+        function openPostCreationModal() {
+            const modal = document.getElementById('postCreationModal');
+            modal.classList.remove('hidden');
+            
+            // Reset form
+            resetPostForm();
+            
+            // Add character counter for text input
+            const textInput = document.getElementById('postTextInput');
+            textInput.addEventListener('input', updateCharCount);
+        }
+
+        function closePostCreationModal() {
+            const modal = document.getElementById('postCreationModal');
+            modal.classList.add('hidden');
+            resetPostForm();
+        }
+
+        function selectPostType(type) {
+            currentPostType = type;
+            
+            // Update button states
+            document.querySelectorAll('.post-type-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(type + 'PostBtn').classList.add('active');
+            
+            // Update content sections
+            document.querySelectorAll('.post-content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(type + 'PostContent').classList.add('active');
+        }
+
+        function resetPostForm() {
+            // Reset text input
+            document.getElementById('postTextInput').value = '';
+            document.getElementById('imageCaptionInput').value = '';
+            
+            // Reset character count
+            document.getElementById('charCount').textContent = '0';
+            
+            // Reset image
+            removeImage();
+        }
+
+        function updateCharCount() {
+            const textInput = document.getElementById('postTextInput');
+            const charCount = document.getElementById('charCount');
+            charCount.textContent = textInput.value.length;
+        }
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImage = e.target.result;
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.querySelector('.upload-placeholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            selectedImage = null;
+            document.getElementById('previewImg').src = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.querySelector('.upload-placeholder').style.display = 'block';
+            document.getElementById('imageInput').value = '';
+        }
+
+        
+        function publishPost() {
+            let postContent = {};
+            
+            if (currentPostType === 'text') {
+                const text = document.getElementById('postTextInput').value.trim();
+                if (!text) {
+                    alert('Please enter some text for your post');
+                    return;
+                }
+                
+                postContent = {
+                    type: 'text',
+                    text: text
+                };
+            } else if (currentPostType === 'image') {
+                const caption = document.getElementById('imageCaptionInput').value.trim();
+                if (!selectedImage) {
+                    alert('Please select an image to upload');
+                    return;
+                }
+                
+                console.log('Creating image post - caption:', caption);
+                console.log('Image data length:', selectedImage.length);
+                console.log('Image data type:', typeof selectedImage);
+                console.log('Image data preview:', selectedImage.substring(0, 100) + '...');
+                
+                postContent = {
+                    type: 'image',
+                    text: caption,
+                    image: selectedImage
+                };
+            }
+            
+            // Create the post
+            createNewPost(postContent);
+        }
+
+        function createNewPost(content) {
+            const userName = currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
+            const userAvatar = currentUser.charAt(0).toUpperCase();
+            const userGradient = getUserGradient(currentUser);
+            
+            const newPost = {
+                id: Date.now(),
+                user: userName,
+                avatar: userAvatar,
+                gradient: userGradient,
+                time: new Date().toLocaleString(),
+                likes: 0,
+                comments: 0,
+                liked: false,
+                ...content
+            };
+            
+            console.log('Creating new post:', newPost);
+            
+            // Load existing posts before adding new post
+            if (!auraFlow) {
+                auraFlow = new AuraFlow();
+            }
+            
+            // Wait for posts to load, then add new post
+            setTimeout(() => {
+                // Add to posts array at the beginning (newest first)
+                auraFlow.posts.unshift(newPost);
+                console.log('Posts array after adding new post:', auraFlow.posts);
+                
+                auraFlow.saveContent();
+                console.log('Posts saved to server');
+                
+                // Verify it was saved
+                const savedPosts = localStorage.getItem('auraFlow_posts');
+                console.log('Verified saved posts from localStorage:', JSON.parse(savedPosts));
+                
+                auraFlow.renderFeed();
+            }, 500); // Give time for posts to load from server
+            
+            // Close modal and show success
+            closePostCreationModal();
+            showNotification('Post published successfully!', 'success');
+        }
+
+        function getUserGradient(userId) {
+            const gradients = {
+                'max': 'avatar-1',
+                'gigi': 'avatar-2', 
+                'marco': 'avatar-3',
+                'dezi': 'avatar-4',
+                'sevi': 'avatar-5'
+            };
+            return gradients[userId] || 'avatar-1';
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification system
+            const notification = document.createElement('div');
+            notification.className = `aura-notification ${type}`;
+            notification.innerHTML = `
+                <h4>${type === 'success' ? '✅' : 'ℹ️'} ${message}</h4>
+            `;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                padding: 1rem;
+                min-width: 250px;
+                z-index: 1000;
+                opacity: 0;
+                transform: translateX(20px);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(20px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Make functions globally accessible
+        window.openPostCreationModal = openPostCreationModal;
+        window.closePostCreationModal = closePostCreationModal;
+        window.selectPostType = selectPostType;
+        window.handleImageSelect = handleImageSelect;
+        window.removeImage = removeImage;
+        window.publishPost = publishPost;
+
+        function createShort() {
+            closeCreateModal();
+            alert('Short recording coming soon!');
+        }
+
+        function refreshFeed() {
+            console.log('Refresh button clicked');
+            
+            // Add spinning animation to refresh button
+            const refreshBtn = document.querySelector('.refresh-feed-btn svg');
+            if (refreshBtn) {
+                refreshBtn.style.animation = 'spin 1s linear infinite';
+            }
+            
+            // Force create new AuraFlow instance to ensure fresh data
+            if (!window.auraFlow) {
+                window.auraFlow = new AuraFlow();
+            }
+            
+            // Call refresh method
+            window.auraFlow.refreshFeed();
+            
+            // Remove spinning animation after delay
+            setTimeout(() => {
+                if (refreshBtn) {
+                    refreshBtn.style.animation = '';
+                }
+            }, 1000);
+        }
+
+        // Global comment functions
+        function openCommentsModal(postId) {
+            // Initialize AuraFlow if it doesn't exist
+            if (!window.auraFlow) {
+                window.auraFlow = new AuraFlow();
+            }
+            
+            window.auraFlow.openComments(postId);
+        }
+
+        function closeCommentsModal() {
+            const modal = document.getElementById('commentsModal');
+            modal.classList.add('hidden');
+            document.getElementById('commentInput').value = '';
+        }
+
+        function addComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('Please enter a comment');
+                return;
+            }
+            
+            if (!currentUser) {
+                alert('Please log in to comment');
+                return;
+            }
+            
+            if (!window.auraFlow || !window.auraFlow.currentPostId) {
+                console.error('No post selected for commenting');
+                return;
+            }
+            
+            const postId = window.auraFlow.currentPostId;
+            const userName = currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
+            const userAvatar = currentUser.charAt(0).toUpperCase();
+            const userGradient = getUserGradient(currentUser);
+            
+            const commentData = {
+                text: text,
+                user: userName,
+                avatar: userAvatar,
+                gradient: userGradient
+            };
+            
+            console.log('Adding comment:', commentData);
+            
+            fetch(`/api/comments/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ comment: commentData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Comment added:', data);
+                
+                // Clear input
+                input.value = '';
+                
+                // Reload comments to show the new one
+                window.auraFlow.loadComments(postId);
+                
+                // Update comment count on post
+                window.auraFlow.updateCommentCount(postId, data.totalComments);
+                
+                // Show success notification
+                if (window.auraFlow.showNotification) {
+                    window.auraFlow.showNotification('Comment added!', 'success');
+                }
+                
+                // Close the comments modal
+                closeCommentsModal();
+            })
+            .catch(error => {
+                console.error('Error adding comment:', error);
+                alert('Failed to add comment. Please try again.');
+            });
+        }
+
+        function getUserGradient(userId) {
+            const gradients = {
+                'max': 'avatar-1',
+                'gigi': 'avatar-2', 
+                'marco': 'avatar-3',
+                'dezi': 'avatar-4',
+                'sevi': 'avatar-5'
+            };
+            return gradients[userId] || 'avatar-1';
+        }
+
+        function togglePostLike(postId) {
+            // Initialize AuraFlow if it doesn't exist
+            if (!window.auraFlow) {
+                window.auraFlow = new AuraFlow();
+            }
+            
+            window.auraFlow.toggleLike(postId);
+        }
+
+        function sharePostModal(postId) {
+            // Initialize AuraFlow if it doesn't exist
+            if (!window.auraFlow) {
+                window.auraFlow = new AuraFlow();
+            }
+            
+            window.auraFlow.sharePost(postId);
+        }
+
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadImageBtn');
+            
+            modalImage.src = imageSrc;
+            downloadBtn.onclick = () => downloadImage(imageSrc);
+            modal.classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+        }
+
+        function downloadImage(imageSrc) {
+            const link = document.createElement('a');
+            
+            // Handle both data URLs and regular URLs
+            if (imageSrc.startsWith('data:')) {
+                const mimeMatch = imageSrc.match(/^data:(image\/\w+);base64,/);
+                if (mimeMatch) {
+                    const mimeType = mimeMatch[1];
+                    const base64Data = imageSrc.split(',')[1];
+                    const byteCharacters = atob(base64Data);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: mimeType });
+                    const url = URL.createObjectURL(blob);
+                    
+                    link.href = url;
+                    link.download = `aura-image-${Date.now()}.${mimeType.split('/')[1]}`;
+                    
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                }
+            } else {
+                link.href = imageSrc;
+                link.download = `aura-image-${Date.now()}.jpg`;
+                link.target = '_blank';
+            }
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+            // Update connection status indicator
+            function updateConnectionStatus(status) {
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+                
+                if (!statusDot || !statusText) return;
+                
+                statusDot.className = `status-dot ${status}`;
+                switch(status) {
+                    case 'connected':
+                        statusText.textContent = 'Connected';
+                        break;
+                    case 'connecting':
+                        statusText.textContent = 'Connecting...';
+                        break;
+                    case 'disconnected':
+                        statusText.textContent = 'Disconnected';
+                        break;
+                    default:
+                        statusText.textContent = 'Unknown';
+                }
+            }
+
+            // Setup WebSocket listeners for real-time updates
+            function setupWebSocketListeners() {
+                // Set initial status
+                updateConnectionStatus('connecting');
+                if (!window.auraWS) {
+                    setTimeout(setupWebSocketListeners, 100);
+                    return;
+                }
+
+                window.auraWS.on('connected', () => {
+                    console.log('WebSocket connected for real-time updates');
+                    showAuraNotification('Connected', 'Real-time updates enabled', 'success');
+                    updateConnectionStatus('connected');
+                });
+
+                window.auraWS.on('disconnected', () => {
+                    console.log('WebSocket disconnected');
+                    showAuraNotification('Disconnected', 'Real-time updates disabled', 'warning');
+                    updateConnectionStatus('disconnected');
+                });
+
+                window.auraWS.on('initialData', (data) => {
+                    console.log('Received initial data via WebSocket:', data);
+                    if (data.auraData) {
+                        auraData = data.auraData;
+                        Object.keys(auraData).forEach(person => {
+                            updateAuraDisplay(person);
+                        });
+                    }
+                    if (data.coinData) {
+                        coinData = data.coinData;
+                        updateCoinDisplay();
+                    }
+                });
+
+                window.auraWS.on('auraUpdated', (data) => {
+                    console.log('Aura updated via WebSocket:', data);
+                    if (data.auraData) {
+                        auraData = data.auraData;
+                        updateAuraDisplay(data.person);
+                    }
+                    if (data.coinData) {
+                        coinData = data.coinData;
+                        updateCoinDisplay();
+                    }
+                    
+                    // Show notification
+                    const actionText = data.action === 'increment' ? 'gave' : 'removed';
+                    const amountText = data.amount > 0 ? `+${data.amount}` : `${data.amount}`;
+                    showAuraNotification('Aura Updated!', `${data.currentUser} ${actionText} ${amountText} aura to ${data.person}`, 'info');
+                });
+
+                window.auraWS.on('auraError', (error) => {
+                    showAuraNotification('Aura Error', error, 'error');
+                });
+
+                window.auraWS.on('newPost', (data) => {
+                    console.log('New post via WebSocket:', data);
+                    showAuraNotification('New Post!', `${data.post.user} just posted something new`, 'success');
+                });
+
+                window.auraWS.on('newComment', (data) => {
+                    console.log('New comment via WebSocket:', data);
+                    showAuraNotification('New Comment!', `${data.comment.user} commented on a post`, 'info');
+                });
+            }
+
+            // Initialize WebSocket listeners
+            setupWebSocketListeners();
+
+            </script>
+        
+        <!-- Compact Image Modal -->
+        <div id="imageModal" class="password-modal hidden">
+            <div class="modal-overlay" onclick="closeImageModal()"></div>
+            <div class="modal-content image-modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Image</h3>
+                    <button class="modal-close" onclick="closeImageModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" class="modal-image" src="" alt="Post image">
+                </div>
+                <div class="modal-footer">
+                    <button id="downloadImageBtn" class="btn btn-primary">
+                        <span style="margin-right: 0.5rem;">⬇</span>
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+</body>
+</html>

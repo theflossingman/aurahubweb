@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Clear All Data</title>
+</head>
+<body>
+    <h1>Force Clearing All Data...</h1>
+    <script>
+        // Clear ALL localStorage data
+        localStorage.clear();
+        
+        // Also clear sessionStorage
+        sessionStorage.clear();
+        
+        // Clear any IndexedDB data
+        if (window.indexedDB) {
+            const databases = indexedDB.databases();
+            databases.then(dbs => {
+                dbs.forEach(db => {
+                    indexedDB.deleteDatabase(db.name);
+                });
+            });
+        }
+        
+        console.log('All storage cleared completely');
+        document.body.innerHTML = '<h1>All Storage Cleared!</h1><p>All localStorage, sessionStorage, and IndexedDB data has been cleared.</p><p>Close this tab and restart your server, then refresh the main app.</p>';
+    </script>
+</body>
+</html>

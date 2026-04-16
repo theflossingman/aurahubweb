@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #4CAF50; }
+        .disconnected { background: #f44336; }
+        .connecting { background: #ff9800; }
+        .log { background: #333; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+        button { padding: 10px 20px; margin: 5px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1976D2; }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Debug Tool</h1>
+    
+    <div id="status" class="status disconnected">Disconnected</div>
+    
+    <div>
+        <button onclick="testAuraUpdate()">Test Aura Update</button>
+        <button onclick="testPost()">Test New Post</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+    
+    <div id="logs"></div>
+
+    <script src="websocket-client.js"></script>
+    <script>
+        let ws = null;
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push({ message: logEntry, type });
+            updateLogDisplay();
+            console.log(logEntry);
+        }
+        
+        function updateLogDisplay() {
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML = logs.map(log => `<div class="log">${log.message}</div>`).join('');
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function updateStatus(status) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${status}`;
+            statusDiv.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+        
+        function initWebSocket() {
+            log('Initializing WebSocket...');
+            
+            if (window.auraWS) {
+                ws = window.auraWS;
+                setupEventListeners();
+                log('WebSocket instance found');
+            } else {
+                log('WebSocket not available, waiting...', 'error');
+                setTimeout(initWebSocket, 1000);
+            }
+        }
+        
+        function setupEventListeners() {
+            ws.on('connected', () => {
+                log('WebSocket connected successfully!');
+                updateStatus('connected');
+            });
+            
+            ws.on('disconnected', () => {
+                log('WebSocket disconnected');
+                updateStatus('disconnected');
+            });
+            
+            ws.on('error', (error) => {
+                log(`WebSocket error: ${error}`, 'error');
+            });
+            
+            ws.on('initialData', (data) => {
+                log('Received initial data');
+                console.log('Initial data:', data);
+            });
+            
+            ws.on('auraUpdated', (data) => {
+                log('Aura update received!');
+                console.log('Aura update:', data);
+            });
+            
+            ws.on('newPost', (data) => {
+                log('New post received!');
+                console.log('New post:', data);
+            });
+        }
+        
+        function testAuraUpdate() {
+            if (!ws || !ws.isReady()) {
+                log('WebSocket not ready for aura update', 'error');
+                return;
+            }
+            
+            const success = ws.updateAura('max', 'increment', 'gigi');
+            if (success) {
+                log('Sent aura update: max +25 from gigi');
+            } else {
+                log('Failed to send aura update', 'error');
+            }
+        }
+        
+        function testPost() {
+            if (!ws || !ws.isReady()) {
+                log('WebSocket not ready for post', 'error');
+                return;
+            }
+            
+            const testPost = {
+                type: 'text',
+                text: 'Test post from WebSocket debug tool!',
+                timestamp: new Date().toISOString()
+            };
+            
+            const success = ws.addPost(testPost);
+            if (success) {
+                log('Sent new post');
+            } else {
+                log('Failed to send post', 'error');
+            }
+        }
+        
+        function clearLogs() {
+            logs = [];
+            updateLogDisplay();
+        }
+        
+        // Start WebSocket connection
+        initWebSocket();
+    </script>
+</body>
+</html>
